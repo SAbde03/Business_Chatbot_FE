@@ -14,9 +14,13 @@ type MessageType = {
   text: string
   sender: 'user' | 'bot'
   timestamp: Date
+  cardData?: string[]
   isClicked?: boolean
-  data?: Map<string, string>
+  data?: string
+  analysis?: string
   isCard?: boolean
+  isClickedB2B?: boolean
+  isClickedB2C?: boolean
 }
 
 
@@ -70,25 +74,32 @@ export default function Chatbot() {
         body: JSON.stringify({ choice: isClickedB2B ? 'b2b' : isClickedB2C ? 'b2c' : 'default', input: inputValue }),
       })
 
-      const data = await response
+      
       
       if (isClickedB2B || isClickedB2C) {
-      const data = await response.text();
-      const blob = new Blob([data], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'data.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+
+      const res = await response.json();
+      const csv=res.csv;
+      const analysis = res.response;
+      const data = csv.text(); 
+      
+     
+      const rows = data.split('\n');
+
+      
+      const firstDataRow = rows[1]; // Second line (first data row)
+      const firstDataValues = firstDataRow.split(',');
+          
       const botMessage: MessageType = {
         id: Date.now().toString(),
-        text:'',
+        text:analysis,
         sender: 'bot',
+        cardData: firstDataValues,
+        data:data,
         isCard: true,
         timestamp: new Date(),
+        isClickedB2B: isClickedB2B,
+        isClickedB2C: isClickedB2C,
       }
       setMessages((prev) => [...prev, botMessage])
     } else {
@@ -146,19 +157,28 @@ const handleB2CClick = () => {
   setMessages(prevMessages => [...prevMessages, newMessage]); */
 };
 }
-   
+ 
+const getText = (event: React.MouseEvent<HTMLDivElement>) => {
+  const text = event.currentTarget.textContent || ''; // Fallback to empty string if null
+  setInputValue(text);
+};
+
+
+
 
  return (
-  <div className="flex flex-col items-center col-reverse justify-center min-h ">
+  <div className="flex flex-col items-center col-reverse justify-center min-h  ">
      <Badge/>
      <div className={'${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s'}>
     Marketing Expert
     </div>
-  <div className="flex flex-col h-[600px]  rounded-lg  bg-transparent ">
-   <div className="flex-1 overflow-y-auto w-150">
+ <div 
+  className={`flex flex-col h-[600px] ${isClickedB2B || isClickedB2C ? 'w-fit  rounded-lg bg-transparent' : 'w-[80%]'}`}>
+   <div className="flex-1 overflow-y-auto min-w-10 max-w-300 bg-transparent">
   <pre className="h-full flex flex-col-reverse relative
   p-[10px]
   h-[410px]
+  w-full
   overflow-y-auto  
   overflow-x-hidden  
   whitespace-nowrap  
@@ -169,11 +189,27 @@ const handleB2CClick = () => {
     <div className="p-4">
       {/* Render messages in normal order (flex-col-reverse handles the positioning) */}
       {messages.map((message) => (
-   
+        
       message.isCard  ? (
+       
+          
+            
+              
       <div key={message.id} className="mb-4">
-        <Message key={message.id} message={message} />
-        <ProfileCard/>
+        
+        <Message key={message.id} message={message}/>
+        <ProfileCard
+        
+        userName={`${message.cardData?.[3] ?? ' '} ${message.cardData?.[4] ?? ''}` || 'Unknown'}
+        gender={message.cardData?.[5] || 'Unknown'}
+        city={message.cardData?.[6] || 'Unknown'}
+        country={message.cardData?.[7] || 'Unknown'}
+        data={message.data}
+        isClickedB2B={message.isClickedB2B}
+        isClickedB2C={message.isClickedB2C}
+        analysis={message.analysis}
+        
+          />
       </div>
     ) : (
       <Message key={message.id} message={message} />
@@ -184,9 +220,24 @@ const handleB2CClick = () => {
     </div>
   </pre>
 </div>
+  <div className="flex gap-5 p-2 h-max w- mb-3 pl-3 bg-transparent overflow-x-auto">
 
+    {isClickedB2C ? (
+  <>
+    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600" onClick={getText}>Lister les hommes de paris</div>
+    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les femmes d'origine francaise</div>
+    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>les personnes qui travaillent à gucci</div>
+  </>
+    ) : isClickedB2B ? (
+  <>
+    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les restaurants sur Marseille</div>
+    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>cafés qui ferment leur portes à dimanche</div>
+    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>les numeros de tel qui commencent par +33 4</div>
+  </>
+   ) : null}
+  </div>
     {/* Input form */}
-    <form onSubmit={handleSubmit} className=" w-full p-4  rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <form onSubmit={handleSubmit} className=" max-w-full p-4  rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
   {/* Button container - bottom left */}
   <div className="flex gap-3 mb-3 pl-3">
     <button
