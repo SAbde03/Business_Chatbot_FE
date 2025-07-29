@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { FiSend, FiUser, FiMessageSquare } from 'react-icons/fi'
+import { FiSend, FiUser, FiMessageSquare, FiDownload } from 'react-icons/fi'
 import Message from './message'
 import ProfileCard from './card'
 import Badge from './badge'
@@ -16,11 +16,13 @@ type MessageType = {
   timestamp: Date
   cardData?: string[]
   isClicked?: boolean
-  data?: string
+  data?: any
   analysis?: string
   isCard?: boolean
   isClickedB2B?: boolean
   isClickedB2C?: boolean
+  rows?: string[]
+  datatype?: string // Added datatype prop
 }
 
 
@@ -31,7 +33,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<MessageType[]>([
     {
       id: '1',
-      text: 'Hello! How can I help you today?',
+      text: 'Bonjour, comment puis-je vous aider?',
       sender: 'bot',
       timestamp: new Date(),
     },
@@ -79,44 +81,51 @@ export default function Chatbot() {
       if (isClickedB2B || isClickedB2C) {
 
       const res = await response.json();
-      const csv=res.csv;
+      const data=res.csv;
       const analysis = res.response;
-      const data = csv.text(); 
+    
       
      
-      const rows = data.split('\n');
+      const rows = data.split('\n').map((row: string) => row.split(','));;
 
       
       const firstDataRow = rows[1]; // Second line (first data row)
-      const firstDataValues = firstDataRow.split(',');
+      //const firstDataValues = firstDataRow.split(',');
           
       const botMessage: MessageType = {
         id: Date.now().toString(),
         text:analysis,
         sender: 'bot',
-        cardData: firstDataValues,
+        //cardData: firstDataValues,
         data:data,
+        rows: rows,
         isCard: true,
         timestamp: new Date(),
         isClickedB2B: isClickedB2B,
         isClickedB2C: isClickedB2C,
+        datatype: isClickedB2B ? 'b2b':'b2c',
       }
       setMessages((prev) => [...prev, botMessage])
     } else {
+      const condition = response.ok;
       const data = await response.json();
+      const responseData = data.response; // Better variable naming than 'daata'
+  
       const botMessage: MessageType = {
-        id: Date.now().toString(),
-        text: data.response,
-        sender: 'bot',
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, botMessage])
+      id: Date.now().toString(),
+      text: condition ? responseData ?? "No response data" : "searching...", // Proper nullish handling
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+  
+      setMessages((prev) => [...prev, botMessage]);
     }
+    
     } catch (error) {
       console.error('Error:', error)
       const errorMessage: MessageType = {
         id: Date.now().toString(),
-        text: 'Sorry, I encountered an error. Please try again.',
+        text: 'Désolé, j\'ai rencontré un problème.',
         sender: 'bot',
         timestamp: new Date(),
         
@@ -125,7 +134,22 @@ export default function Chatbot() {
       setMessages((prev) => [...prev, errorMessage])
     }
   }
+  const handleDownload = (message: MessageType) => {
+  if (!message.data) {
+    console.error('No data available to download');
+    return;
+  }
 
+  const blob = new Blob([message.data], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = message.isClickedB2B ? 'b2b_data.csv' : 'b2c_data.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+};
   const handleB2BClick = () => {
   // Create the profile card data
   setIsClickedB2B(!isClickedB2B);
@@ -167,13 +191,13 @@ const getText = (event: React.MouseEvent<HTMLDivElement>) => {
 
 
  return (
-  <div className="flex flex-col items-center col-reverse justify-center min-h  ">
+  <div className="flex flex-col items-center col-reverse justify-center h-full  ">
      <Badge/>
      <div className={'${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s'}>
     Marketing Expert
     </div>
  <div 
-  className={`flex flex-col h-[600px] ${isClickedB2B || isClickedB2C ? 'w-fit  rounded-lg bg-transparent' : 'w-[80%]'}`}>
+  className={`flex flex-col h-[630px] ${isClickedB2B || isClickedB2C ? 'w-fit  rounded-lg bg-transparent' : 'w-[50%]'}`}>
    <div className="flex-1 overflow-y-auto min-w-10 max-w-300 bg-transparent">
   <pre className="h-full flex flex-col-reverse relative
   p-[10px]
@@ -192,25 +216,44 @@ const getText = (event: React.MouseEvent<HTMLDivElement>) => {
         
       message.isCard  ? (
        
-          
-            
-              
       <div key={message.id} className="mb-4">
         
-        <Message key={message.id} message={message}/>
-        <ProfileCard
-        
-        userName={`${message.cardData?.[3] ?? ' '} ${message.cardData?.[4] ?? ''}` || 'Unknown'}
-        gender={message.cardData?.[5] || 'Unknown'}
-        city={message.cardData?.[6] || 'Unknown'}
-        country={message.cardData?.[7] || 'Unknown'}
-        data={message.data}
-        isClickedB2B={message.isClickedB2B}
-        isClickedB2C={message.isClickedB2C}
-        analysis={message.analysis}
-        
-          />
-      </div>
+  <Message key={message.id} message={message} />
+  <div 
+  className={`mb-4 ml-15  w-fit flex flex-col gap-4 bg-zinc-700/20 p-4 rounded-lg cursor-pointer `}
+>
+  <div className='relative h-5 break-words'>
+    <span className={`ml-5 mt-10 ${inter.className}`}>Aperçu</span>
+        <button
+                    onClick={() => handleDownload(message)}
+                    disabled={!message.data}
+                   className={`${inter.className}"p-1 flex flex-row justify-center gap-3 text-xs absolute top-0 right-5 hover:bg-zinc-400/20 p-1 rounded-lg`}
+                  >                                                                                       
+                  <FiDownload className="text-lg text-gray font-bold" /> 
+      </button>
+  </div>
+  <div className="mb-4  w-fit grid md:grid-cols-2 sm:grid-cols-1 gap-4 bg-transparent p-4 rounded-lg">
+  
+  
+  {message.rows?.slice(1,5).map((dataRow, rowIndex) => (
+    <ProfileCard
+      key={`${message.id}-${rowIndex}`}  // Unique key for each card
+      userName={`${dataRow[3] ?? ''} ${dataRow[4] ?? ''}`.trim() || 'Unknown'}
+      gender={dataRow[5] || 'Unknown'}
+      city={dataRow[6] || 'Unknown'}
+      country={dataRow[7] || 'Unknown'}
+      data={message.data}
+      isClickedB2B={message.isClickedB2B}
+      isClickedB2C={message.isClickedB2C}
+      analysis={message.analysis}
+      rows={message.rows}
+      datatype={message.datatype}
+    />
+  ))}
+  
+  </div>
+  </div>
+</div>
     ) : (
       <Message key={message.id} message={message} />
       
@@ -220,24 +263,24 @@ const getText = (event: React.MouseEvent<HTMLDivElement>) => {
     </div>
   </pre>
 </div>
-  <div className="flex gap-5 p-2 h-max w- mb-3 pl-3 bg-transparent overflow-x-auto">
+  <div className="flex flex-col gap-2 lg:flex-row lg:gap-5 sm:w-fit p-2 h-max w- mb-3 pl-3 bg-transparent overflow-x-auto">
 
     {isClickedB2C ? (
   <>
-    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600" onClick={getText}>Lister les hommes de paris</div>
-    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les femmes d'origine francaise</div>
-    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>les personnes qui travaillent à gucci</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600" onClick={getText}>Lister les hommes de paris</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les femmes d'origine française</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les personnes qui travaillent à gucci</div>
   </>
     ) : isClickedB2B ? (
   <>
-    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les restaurants sur Marseille</div>
-    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>cafés qui ferment leur portes à dimanche</div>
-    <div className="p-2 h-max text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>les numeros de tel qui commencent par +33 4</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les restaurants sur Marseille</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Cafés qui ferment leur portes à dimanche</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les numeros de tel qui commencent par +33 4</div>
   </>
    ) : null}
   </div>
     {/* Input form */}
-    <form onSubmit={handleSubmit} className=" max-w-full p-4  rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+    <form onSubmit={handleSubmit} className=" min-w-[60%] p-4  rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
   {/* Button container - bottom left */}
   <div className="flex gap-3 mb-3 pl-3">
     <button
@@ -271,8 +314,8 @@ const getText = (event: React.MouseEvent<HTMLDivElement>) => {
       type="text"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
-      placeholder="Type your message..."
-      className="flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 "
+      placeholder="Ecrivez votre message..."
+      className="flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words"
     />
     <button
       type="submit"
