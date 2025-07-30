@@ -57,11 +57,11 @@ export default function Chatbot() {
     }
     setMessages((prev) => [...prev, userMessage])
     setInputValue('')
-  
-    
-    
+
+
+
     try {
-      
+
       const response = await fetch('http://localhost:3002/api/crew', {
         method: 'POST',
         headers: {
@@ -71,7 +71,7 @@ export default function Chatbot() {
       })
 
       const data = await response
-      
+
       if (isClickedB2B || isClickedB2C) {
       const data = await response.text();
       const blob = new Blob([data], { type: 'text/csv' });
@@ -108,7 +108,7 @@ export default function Chatbot() {
         text: 'Sorry, I encountered an error. Please try again.',
         sender: 'bot',
         timestamp: new Date(),
-        
+
       }
 
       setMessages((prev) => [...prev, errorMessage])
@@ -140,13 +140,13 @@ const handleB2CClick = () => {
     sender: "bot" as const,
     timestamp: new Date(),
     isCard: true,
-  
+
 
   /* Add to messages
   setMessages(prevMessages => [...prevMessages, newMessage]); */
 };
 }
-   
+
 
  return (
   <div className="flex flex-col items-center col-reverse justify-center min-h ">
@@ -159,9 +159,9 @@ const handleB2CClick = () => {
   <pre className="h-full flex flex-col-reverse relative
   p-[10px]
   h-[410px]
-  overflow-y-auto  
-  overflow-x-hidden  
-  whitespace-nowrap  
+  overflow-y-auto
+  overflow-x-hidden
+  whitespace-nowrap
   rounded-[8px]
   break-words
   [scrollbar-width:none]
@@ -169,7 +169,7 @@ const handleB2CClick = () => {
     <div className="p-4">
       {/* Render messages in normal order (flex-col-reverse handles the positioning) */}
       {messages.map((message) => (
-   
+
       message.isCard  ? (
       <div key={message.id} className="mb-4">
         <Message key={message.id} message={message} />
@@ -177,7 +177,7 @@ const handleB2CClick = () => {
       </div>
     ) : (
       <Message key={message.id} message={message} />
-      
+
     )
   ))}
       <div ref={messagesEndRef} />

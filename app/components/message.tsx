@@ -1,7 +1,5 @@
-import { FiUser } from 'react-icons/fi'
-import { FiMessageSquare } from 'react-icons/fi'
-import { Inter, Roboto, Open_Sans } from 'next/font/google';
 import { AiFillRobot } from 'react-icons/ai';
+import {Inter} from "next/font/google";
 const inter = Inter({ subsets: ['latin'] });
 type MessageProps = {
   message: {
@@ -11,6 +9,7 @@ type MessageProps = {
     timestamp: Date
     isCard?: boolean
     isClicked?: boolean
+    isStreaming?: boolean
   }
 }
 
