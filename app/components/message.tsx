@@ -1,4 +1,4 @@
-import { FiUser } from 'react-icons/fi'
+import { FiCopy, FiUser } from 'react-icons/fi'
 import { FiMessageSquare } from 'react-icons/fi'
 import { Inter, Roboto, Open_Sans } from 'next/font/google';
 import { AiFillRobot } from 'react-icons/ai';
@@ -45,10 +45,10 @@ export default function Message({ message }: MessageProps) {
   };
   return (
     <div
-      className={`flex mb-4  ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+      className={`flex mb-10  ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`flex max-w-xs md:max-w-md lg:max-w-2xl ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
+        className={`relative flex max-w-xs md:max-w-md lg:max-w-2xl ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
       >
         <div
           className={`rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -83,16 +83,14 @@ export default function Message({ message }: MessageProps) {
               minute: '2-digit',
             })}
           </p> */}
-          { message.isClicked ? (
-             <button
-                   type="submit"
-                   className={`${inter.className}"p-1 px-3 py-3 bg-white text-black  rounded-full hover:bg-white-700 transition-colors focus:outline-none`}
-                 >
-                  Download .csv
-                 </button>
-          ) : null }
+          
         </div>
+        
       </div>
+      <div>
+
+      </div>
+      
     </div>
   )
 }

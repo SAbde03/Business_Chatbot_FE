@@ -113,7 +113,7 @@ export default function Chatbot() {
   
       const botMessage: MessageType = {
       id: Date.now().toString(),
-      text: condition ? responseData ?? "No response data" : "searching...", // Proper nullish handling
+      text: responseData, // Proper nullish handling
       sender: 'bot',
       timestamp: new Date(),
     };
@@ -220,7 +220,7 @@ const getText = (event: React.MouseEvent<HTMLDivElement>) => {
         
   <Message key={message.id} message={message} />
   <div 
-  className={`mb-4 ml-15  w-fit flex flex-col gap-4 bg-zinc-700/20 p-4 rounded-lg cursor-pointer `}
+  className={`mb-4 ml-15 w-[600px] flex flex-col gap-4 bg-zinc-700/20 p-4 rounded-lg cursor-pointer `}
 >
   <div className='relative h-5 break-words'>
     <span className={`ml-5 mt-10 ${inter.className}`}>Aperçu</span>
@@ -232,6 +232,7 @@ const getText = (event: React.MouseEvent<HTMLDivElement>) => {
                   <FiDownload className="text-lg text-gray font-bold" /> 
       </button>
   </div>
+  {/*
   <div className="mb-4  w-fit grid md:grid-cols-2 sm:grid-cols-1 gap-4 bg-transparent p-4 rounded-lg">
   
   
@@ -252,6 +253,97 @@ const getText = (event: React.MouseEvent<HTMLDivElement>) => {
   ))}
   
   </div>
+  */}
+  <div className="overflow-x-auto w-full 
+               [scrollbar-width:] [scrollbar-color:#8c9096_transparent]
+               [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full">
+  <table className="w-full bg-transparent ">
+    <thead className="bg-zinc-700">
+      <tr>
+        {message.datatype === 'b2c' ? (
+  
+      <>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Nom</th>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Genre</th>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Ville</th>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Pays</th>
+        <th className='px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider'>Email</th>
+        <th className='px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider'>Departement</th>
+        <th className='px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider'>Region</th>
+      </>
+     ) : (
+  
+      <>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Nom</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Avis</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Notation</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Telephone</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Gérant</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Ville</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Adresse</th>
+          </>
+    )}
+      </tr>
+    </thead>
+    <tbody className="">
+      {message.rows?.slice(1, 5).map((dataRow, rowIndex) => (
+        <tr 
+          key={`${message.id}-${rowIndex}`} 
+          className={rowIndex % 2 === 0 ? 'bg-black/20' : 'bg-zinc-800'}
+        >
+          {message.datatype === 'b2c' ? (
+            <>
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+            {`${dataRow[3] ?? ''} ${dataRow[4] ?? ''}`.trim() || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[5] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[6] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[7] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[12] || 'Unknown'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[13] || 'NaN'} 
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[14] || 'NaN'} 
+          </td>
+          </>):(
+              <>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                {`${dataRow[1]}`|| 'NaN'}
+              </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[4] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[5] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[380] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[12] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[16] || 'NaN'} 
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[25] || 'NaN'} 
+          </td>
+              </>
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
   </div>
 </div>
     ) : (
