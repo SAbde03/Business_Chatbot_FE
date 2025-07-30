@@ -14,9 +14,15 @@ type MessageType = {
   text: string
   sender: 'user' | 'bot'
   timestamp: Date
+  cardData?: string[]
   isClicked?: boolean
-  data?: Map<string, string>
+  data?: any
+  analysis?: string
   isCard?: boolean
+  isClickedB2B?: boolean
+  isClickedB2C?: boolean
+  rows?: string[]
+  datatype?: string // Added datatype prop
 }
 
 
@@ -27,7 +33,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<MessageType[]>([
     {
       id: '1',
-      text: 'Hello! How can I help you today?',
+      text: 'Bonjour, comment puis-je vous aider?',
       sender: 'bot',
       timestamp: new Date(),
     },
@@ -57,11 +63,11 @@ export default function Chatbot() {
     }
     setMessages((prev) => [...prev, userMessage])
     setInputValue('')
-
-
-
+  
+    
+    
     try {
-
+      
       const response = await fetch('http://localhost:3002/api/crew', {
         method: 'POST',
         headers: {
@@ -70,8 +76,8 @@ export default function Chatbot() {
         body: JSON.stringify({ choice: isClickedB2B ? 'b2b' : isClickedB2C ? 'b2c' : 'default', input: inputValue }),
       })
 
-      const data = await response
 
+      
       if (isClickedB2B || isClickedB2C) {
       const data = await response.text();
       const blob = new Blob([data], { type: 'text/csv' });
@@ -87,34 +93,60 @@ export default function Chatbot() {
         id: Date.now().toString(),
         text:'',
         sender: 'bot',
+        //cardData: firstDataValues,
+        data:data,
+        rows: rows,
         isCard: true,
         timestamp: new Date(),
+        isClickedB2B: isClickedB2B,
+        isClickedB2C: isClickedB2C,
+        datatype: isClickedB2B ? 'b2b':'b2c',
       }
       setMessages((prev) => [...prev, botMessage])
     } else {
+      const condition = response.ok;
       const data = await response.json();
+      const responseData = data.response; // Better variable naming than 'daata'
+
       const botMessage: MessageType = {
-        id: Date.now().toString(),
-        text: data.response,
-        sender: 'bot',
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, botMessage])
+      id: Date.now().toString(),
+      text: responseData, // Proper nullish handling
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+
+      setMessages((prev) => [...prev, botMessage]);
     }
+
     } catch (error) {
       console.error('Error:', error)
       const errorMessage: MessageType = {
         id: Date.now().toString(),
-        text: 'Sorry, I encountered an error. Please try again.',
+        text: 'Désolé, j\'ai rencontré un problème.',
         sender: 'bot',
         timestamp: new Date(),
-
+        
       }
 
       setMessages((prev) => [...prev, errorMessage])
     }
   }
+  const handleDownload = (message: MessageType) => {
+  if (!message.data) {
+    console.error('No data available to download');
+    return;
+  }
 
+  const blob = new Blob([message.data], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = message.isClickedB2B ? 'b2b_data.csv' : 'b2c_data.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+};
   const handleB2BClick = () => {
   // Create the profile card data
   setIsClickedB2B(!isClickedB2B);
@@ -140,28 +172,37 @@ const handleB2CClick = () => {
     sender: "bot" as const,
     timestamp: new Date(),
     isCard: true,
-
+  
 
   /* Add to messages
   setMessages(prevMessages => [...prevMessages, newMessage]); */
 };
 }
 
+const getText = (event: React.MouseEvent<HTMLDivElement>) => {
+  const text = event.currentTarget.textContent || ''; // Fallback to empty string if null
+  setInputValue(text);
+};
+
+
+
 
  return (
-  <div className="flex flex-col items-center col-reverse justify-center min-h ">
+  <div className="flex flex-col items-center col-reverse justify-center h-full  ">
      <Badge/>
      <div className={'${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s'}>
     Marketing Expert
     </div>
-  <div className="flex flex-col h-[600px]  rounded-lg  bg-transparent ">
-   <div className="flex-1 overflow-y-auto w-150">
+ <div
+  className={`flex flex-col h-[630px] ${isClickedB2B || isClickedB2C ? 'w-fit  rounded-lg bg-transparent' : 'w-[50%]'}`}>
+   <div className="flex-1 overflow-y-auto min-w-10 max-w-300 bg-transparent">
   <pre className="h-full flex flex-col-reverse relative
   p-[10px]
   h-[410px]
+  w-full
   overflow-y-auto
-  overflow-x-hidden
-  whitespace-nowrap
+  overflow-x-hidden  
+  whitespace-nowrap  
   rounded-[8px]
   break-words
   [scrollbar-width:none]
@@ -171,22 +212,164 @@ const handleB2CClick = () => {
       {messages.map((message) => (
 
       message.isCard  ? (
+
       <div key={message.id} className="mb-4">
-        <Message key={message.id} message={message} />
-        <ProfileCard/>
-      </div>
+
+  <Message key={message.id} message={message} />
+  <div
+  className={`mb-4 ml-15 w-[600px] flex flex-col gap-4 bg-zinc-700/20 p-4 rounded-lg cursor-pointer `}
+>
+  <div className='relative h-5 break-words'>
+    <span className={`ml-5 mt-10 ${inter.className}`}>Aperçu</span>
+        <button
+                    onClick={() => handleDownload(message)}
+                    disabled={!message.data}
+                   className={`${inter.className}"p-1 flex flex-row justify-center gap-3 text-xs absolute top-0 right-5 hover:bg-zinc-400/20 p-1 rounded-lg`}
+                  >
+                  <FiDownload className="text-lg text-gray font-bold" />
+      </button>
+  </div>
+  {/*
+  <div className="mb-4  w-fit grid md:grid-cols-2 sm:grid-cols-1 gap-4 bg-transparent p-4 rounded-lg">
+
+
+  {message.rows?.slice(1,5).map((dataRow, rowIndex) => (
+    <ProfileCard
+      key={`${message.id}-${rowIndex}`}  // Unique key for each card
+      userName={`${dataRow[3] ?? ''} ${dataRow[4] ?? ''}`.trim() || 'Unknown'}
+      gender={dataRow[5] || 'Unknown'}
+      city={dataRow[6] || 'Unknown'}
+      country={dataRow[7] || 'Unknown'}
+      data={message.data}
+      isClickedB2B={message.isClickedB2B}
+      isClickedB2C={message.isClickedB2C}
+      analysis={message.analysis}
+      rows={message.rows}
+      datatype={message.datatype}
+    />
+  ))}
+
+  </div>
+  */}
+  <div className="overflow-x-auto w-full
+               [scrollbar-width:] [scrollbar-color:#8c9096_transparent]
+               [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full">
+  <table className="w-full bg-transparent ">
+    <thead className="bg-zinc-700">
+      <tr>
+        {message.datatype === 'b2c' ? (
+
+      <>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Nom</th>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Genre</th>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Ville</th>
+        <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Pays</th>
+        <th className='px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider'>Email</th>
+        <th className='px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider'>Departement</th>
+        <th className='px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider'>Region</th>
+      </>
+     ) : (
+
+      <>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Nom</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Avis</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Notation</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Telephone</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Gérant</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Ville</th>
+    <th className="px-6 py-3 text-left text-xs font-bold text-zinc-300 uppercase tracking-wider">Adresse</th>
+          </>
+    )}
+      </tr>
+    </thead>
+    <tbody className="">
+      {message.rows?.slice(1, 5).map((dataRow, rowIndex) => (
+        <tr
+          key={`${message.id}-${rowIndex}`}
+          className={rowIndex % 2 === 0 ? 'bg-black/20' : 'bg-zinc-800'}
+        >
+          {message.datatype === 'b2c' ? (
+            <>
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+            {`${dataRow[3] ?? ''} ${dataRow[4] ?? ''}`.trim() || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[5] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[6] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[7] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[12] || 'Unknown'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[13] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[14] || 'NaN'}
+          </td>
+          </>):(
+              <>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                {`${dataRow[1]}`|| 'NaN'}
+              </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[4] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[5] || 'NaN'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+            {dataRow[380] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[12] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[16] || 'NaN'}
+          </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+            {dataRow[25] || 'NaN'}
+          </td>
+              </>
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+  </div>
+</div>
     ) : (
       <Message key={message.id} message={message} />
-
+      
     )
   ))}
       <div ref={messagesEndRef} />
     </div>
   </pre>
 </div>
+  <div className="flex flex-col gap-2 lg:flex-row lg:gap-5 sm:w-fit p-2 h-max w- mb-3 pl-3 bg-transparent overflow-x-auto">
 
+    {isClickedB2C ? (
+  <>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600" onClick={getText}>Lister les hommes de paris</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les femmes d'origine française</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les personnes qui travaillent à gucci</div>
+  </>
+    ) : isClickedB2B ? (
+  <>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les restaurants sur Marseille</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Cafés qui ferment leur portes à dimanche</div>
+    <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600"onClick={getText}>Les numeros de tel qui commencent par +33 4</div>
+  </>
+   ) : null}
+  </div>
     {/* Input form */}
-    <form onSubmit={handleSubmit} className=" w-full p-4  rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <form onSubmit={handleSubmit} className=" min-w-[60%] p-4  rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
   {/* Button container - bottom left */}
   <div className="flex gap-3 mb-3 pl-3">
     <button
@@ -220,8 +403,8 @@ const handleB2CClick = () => {
       type="text"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
-      placeholder="Type your message..."
-      className="flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 "
+      placeholder="Ecrivez votre message..."
+      className="flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words"
     />
     <button
       type="submit"
