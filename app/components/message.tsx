@@ -15,15 +15,16 @@ type MessageProps = {
     isCard?: boolean
     isClicked?: boolean
   }
+  isStreaming?: boolean
 }
 
-export default function Message({ message }: MessageProps) {
+export default function Message({ message, isStreaming }: MessageProps) {
   const components: Components = {
     // Bold text handling (**text**)
     strong: ({ node, ...props }) => (
       <strong className="text-l font-bold text-inherit" {...props} />
     ),
-    
+
     h1: ({node, ...props }) => (
       <h1 className="text-2xl font-bold mt-6   pb-2" {...props} />
     ),
@@ -31,7 +32,7 @@ export default function Message({ message }: MessageProps) {
     h2: ({node, ...props }) => (
       <h2 className="text-xl font-bold mt-6 mb-4  pb-2" {...props} />
     ),
-    
+
     // Add other heading levels if needed
     h3: ({node, ...props }) => (
       <h3 className="text-l font-light mt-5 mb-3" {...props} />
@@ -65,10 +66,16 @@ export default function Message({ message }: MessageProps) {
               ? 'bg-zinc-600 text-white rounded-tr-none '
               : 'bg-gray-1000 text-white-800 rounded-tl-none w-full '
           }`}
-        >
+        >{isStreaming?(
+            <div className="mt-2 text-xs text-blue-400 flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
+              Géneration en cours...
+            </div>
+        ):null}
+
           <div className={`${inter.className}  break-words whitespace-normal  w-[100%] overflow-auto text-[15px]`}><ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        
+
         components={components}
       >
     {message.text}
@@ -83,14 +90,14 @@ export default function Message({ message }: MessageProps) {
               minute: '2-digit',
             })}
           </p> */}
-          
+
         </div>
-        
+
       </div>
       <div>
 
       </div>
-      
+
     </div>
   )
 }
