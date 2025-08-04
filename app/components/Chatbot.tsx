@@ -317,22 +317,14 @@ export default function Chatbot() {
         })
 
         if (isClickedB2B || isClickedB2C) {
-          const data = await response.text()
-          const blob = new Blob([data], { type: 'text/csv' })
-          const url = window.URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = 'data.csv'
-          document.body.appendChild(a)
-          a.click()
-          document.body.removeChild(a)
-          window.URL.revokeObjectURL(url)
-
-          const rows = data.split('\n').map(row => row.split(','))
+          const res = await response.json()
+          const analysis = res.response;
+          const data = res.csv
+          const rows = data.split('\n').map((row: string) => row.split(','))
 
           const botMessage: MessageType = {
             id: Date.now().toString(),
-            text: '',
+            text: analysis,
             sender: 'bot',
             data: data,
             rows: rows,
@@ -582,3 +574,4 @@ export default function Chatbot() {
         </div>
       </div>
   )
+}
