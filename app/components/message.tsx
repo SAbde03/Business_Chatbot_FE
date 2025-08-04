@@ -66,12 +66,14 @@ export default function Message({ message, isStreaming }: MessageProps) {
               ? 'bg-zinc-600 text-white rounded-tr-none '
               : 'bg-gray-1000 text-white-800 rounded-tl-none w-full '
           }`}
-        >{isStreaming?(
-            <div className="mt-2 text-xs text-white flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
-              Géneration en cours...
+        >{isStreaming ?(
+            <div className="mt-2 mb-2 text-xs  flex items-center gap-2 ">
+              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              <span className='text-white/80 animate-pulse'>Géneration en cours...</span>
             </div>
         ):null}
+
+        
 
           <div className={`${inter.className}  break-words whitespace-normal  w-[100%] overflow-auto text-[15px]`}><ReactMarkdown
         remarkPlugins={[remarkGfm]}
