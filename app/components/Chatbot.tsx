@@ -321,7 +321,7 @@ export default function Chatbot() {
           const analysis = res.response;
           const data = res.csv
           const rows = data.split('\n').map((row: string) => row.split(','))
-
+          
           const botMessage: MessageType = {
             id: Date.now().toString(),
             text: analysis,

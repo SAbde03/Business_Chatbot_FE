@@ -67,9 +67,9 @@ export default function Message({ message, isStreaming }: MessageProps) {
               : 'bg-gray-1000 text-white-800 rounded-tl-none w-full '
           }`}
         >{isStreaming ?(
-            <div className="mt-2 mb-2 text-xs  flex items-center gap-2 ">
-              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-              <span className='text-white/80 animate-pulse'>Géneration en cours...</span>
+            <div className="mt-1 mb-2 text-xs  flex items-center gap-2 ">
+              <div className="w-3 h-3 bg-white rounded-full animate-ping {style}"></div>
+              
             </div>
         ):null}
 
