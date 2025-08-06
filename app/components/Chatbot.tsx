@@ -173,7 +173,7 @@ class StreamingClient {
 }
 
 export default function Chatbot() {
-  const [status, setStatus] = useState(false)
+  const [status, setStatus] = useState(true)
   const [isClickedB2B, setIsClickedB2B] = useState(false)
   const [isClickedB2C, setIsClickedB2C] = useState(false)
   const [messages, setMessages] = useState<MessageType[]>([
