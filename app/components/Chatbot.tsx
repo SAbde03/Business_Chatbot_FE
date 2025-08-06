@@ -27,6 +27,7 @@ type MessageType = {
   datatype?: string
   isStreaming?: boolean
   streamingComplete?: boolean
+  status?:boolean
 }
 
 class StreamingClient {
@@ -86,7 +87,7 @@ class StreamingClient {
 
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split('\n');
-            buffer = lines.pop() || ''; // Garder la dernière ligne incomplète
+            buffer = lines.pop() || ''; 
 
             for (const line of lines) {
               if (line.startsWith('data: ')) {
@@ -172,6 +173,7 @@ class StreamingClient {
 }
 
 export default function Chatbot() {
+  const [status, setStatus] = useState(false)
   const [isClickedB2B, setIsClickedB2B] = useState(false)
   const [isClickedB2C, setIsClickedB2C] = useState(false)
   const [messages, setMessages] = useState<MessageType[]>([
@@ -299,44 +301,109 @@ export default function Chatbot() {
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
 
-    try {
+   try {
       // Si c'est une requête par défaut, utiliser le streaming
       if (!isClickedB2B && !isClickedB2C) {
         handleStreamingResponse(userMessage)
       } else {
         // Pour B2B et B2C, utiliser l'ancienne méthode
-        const response = await fetch('http://localhost:3002/api/crew', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            choice: isClickedB2B ? 'b2b' : isClickedB2C ? 'b2c' : 'default',
-            input: inputValue
-          }),
-        })
+       const response = await fetch('http://localhost:3002/api/crew', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        choice: isClickedB2B ? 'b2b' : isClickedB2C ? 'b2c' : 'default',
+        input: inputValue
+      }),
+     });
 
-        if (isClickedB2B || isClickedB2C) {
-          const res = await response.json()
-          const analysis = res.response;
-          const data = res.csv
-          const rows = data.split('\n').map((row: string) => row.split(','))
-          
-          const botMessage: MessageType = {
-            id: Date.now().toString(),
-            text: analysis,
-            sender: 'bot',
-            data: data,
-            rows: rows,
-            isCard: true,
-            timestamp: new Date(),
-            isClickedB2B: isClickedB2B,
-            isClickedB2C: isClickedB2C,
-            datatype: isClickedB2B ? 'b2b' : 'b2c',
+     setStatus(false)
+      // Création d'un message temporaire pour le statut
+      const tempMessage: MessageType = {
+        id: `temp-${Date.now()}`,
+        text: 'Traitement en cours...',
+        sender: 'bot',
+        isCard: false,
+        timestamp: new Date(),
+        status: false
+      };
+      setMessages(prev => [...prev, tempMessage]);
+
+      // Lecture du flux SSE
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let finalData = {
+        response: '',
+        csv: ''
+      };
+
+      while (reader) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n\n').filter(line => line.startsWith('data: '));
+
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line.replace('data: ', ''));
+            
+            // Mise à jour du statut
+            if (data.status === 'processing') {
+              setMessages(prev => prev.map(msg => 
+                msg.id === tempMessage.id 
+                  ? { ...msg, text: data.message, progress: data.progress } 
+                  : msg
+              ));
+            }
+
+            // Stockage des données finales
+            if (data.status === 'success') {
+              finalData = {
+                response: data.response,
+                csv: data.csv
+              };
+              setStatus(true);
+            }
+
+            // Gestion des erreurs
+            if (data.status === 'error') {
+              setMessages(prev => prev.map(msg => 
+                msg.id === tempMessage.id 
+                  ? { ...msg, text: `Erreur: ${data.message}`, isError: true } 
+                  : msg
+              ));
+              return;
+            }
+
+          } catch (e) {
+            console.error('Error parsing SSE chunk:', e);
           }
-          setMessages(prev => [...prev, botMessage])
         }
       }
+
+      // Remplacement du message temporaire par le résultat final
+      if (finalData.response) {
+        const rows = finalData.csv.split('\n').map((row: string) => row.split(','));
+        
+        const botMessage: MessageType = {
+          id: Date.now().toString(),
+          text: finalData.response,
+          sender: 'bot',
+          data: finalData.csv,
+          rows: rows,
+          isCard: true,
+          timestamp: new Date(),
+          isClickedB2B: isClickedB2B,
+          isClickedB2C: isClickedB2C,
+          datatype: isClickedB2B ? 'b2b' : 'b2c',
+          status: true
+        };
+        
+        setMessages(prev => [...prev.filter(msg => msg.id !== tempMessage.id), botMessage]);
+      }
+    }
     } catch (error) {
       console.error('Error:', error)
       const errorMessage: MessageType = {
@@ -552,7 +619,7 @@ export default function Chatbot() {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={isStreaming ? "IA en cours de réponse..." : "Ecrivez votre message..."}
+                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Ecrivez votre message..."}
                   disabled={isStreaming}
                   className={`flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words ${
                       isStreaming ? 'opacity-50 cursor-not-allowed' : ''

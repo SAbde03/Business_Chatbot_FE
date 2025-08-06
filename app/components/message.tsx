@@ -14,6 +14,7 @@ type MessageProps = {
     timestamp: Date
     isCard?: boolean
     isClicked?: boolean
+    status?:boolean
   }
   isStreaming?: boolean
 }
@@ -73,9 +74,8 @@ export default function Message({ message, isStreaming }: MessageProps) {
             </div>
         ):null}
 
-        
 
-          <div className={`${inter.className}  break-words whitespace-normal  w-[100%] overflow-auto text-[15px]`}><ReactMarkdown
+          <div className={`${inter.className}  break-words whitespace-normal  w-[100%] overflow-auto text-[15px] ${message.status == false ? 'animate-pulse text-white/30': ''}`}><ReactMarkdown
         remarkPlugins={[remarkGfm]}
 
         components={components}
