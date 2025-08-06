@@ -14,6 +14,7 @@ type MessageProps = {
     timestamp: Date
     isCard?: boolean
     isClicked?: boolean
+    status?:boolean
   }
   isStreaming?: boolean
 }
@@ -67,14 +68,15 @@ export default function Message({ message, isStreaming }: MessageProps) {
               : 'bg-gray-1000 text-white-800 rounded-tl-none w-full '
           }`}
         >{isStreaming ?(
-            <div className="mt-2 mb-2 text-xs  flex items-center gap-2 ">
-              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+            <div className="mt-1 mb-2 text-xs  flex items-center gap-2 ">
+              <div className="w-3 h-3 bg-white rounded-full animate-ping {style}"></div>
+
             </div>
         ):null}
 
         
 
-          <div className={`${inter.className}  break-words whitespace-normal  w-[100%] overflow-auto text-[15px]`}><ReactMarkdown
+          <div className={`${inter.className}  break-words whitespace-normal  w-[100%] overflow-auto text-[15px] ${message.status == false ? 'animate-pulse text-white/30': ''}`}><ReactMarkdown
         remarkPlugins={[remarkGfm]}
 
         components={components}
