@@ -23,11 +23,12 @@ type MessageType = {
   isCard?: boolean
   isClickedB2B?: boolean
   isClickedB2C?: boolean
-  rows?: string[]
+  rows?: string[][]
   datatype?: string
   isStreaming?: boolean
   streamingComplete?: boolean
   status?:boolean
+  header?:string[]
 }
 
 class StreamingClient {
@@ -398,7 +399,8 @@ export default function Chatbot() {
           isClickedB2B: isClickedB2B,
           isClickedB2C: isClickedB2C,
           datatype: isClickedB2B ? 'b2b' : 'b2c',
-          status: true
+          status: true,
+          headers: finalData.csv.split('\n')[0].split(';'),
         };
         
         setMessages(prev => [...prev.filter(msg => msg.id !== tempMessage.id), botMessage]);
@@ -512,7 +514,7 @@ export default function Chatbot() {
                               </tr>
                               </thead>
                               <tbody>
-                              {message.rows?.slice(1, 5).map((dataRow, rowIndex) => (
+                              {message.rows?.slice(1, 2).map((dataRow, rowIndex) => (
                                   <tr key={`${message.id}-${rowIndex}`} className={rowIndex % 2 === 0 ? 'bg-black/20' : 'bg-zinc-800'}>
                                     {message.datatype === 'b2c' ? (
                                         <>
@@ -531,10 +533,10 @@ export default function Chatbot() {
                                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">{dataRow[1] || 'NaN'}</td>
                                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[4] || 'NaN'}</td>
                                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[5] || 'NaN'}</td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[380] || 'NaN'}</td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[12] || 'NaN'}</td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[16] || 'NaN'}</td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[25] || 'NaN'}</td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[8] || 'NaN'}</td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[8] || 'NaN'}</td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[36]|| 'NaN'}</td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[36]||'NAN'}</td>
                                         </>
                                     )}
                                   </tr>
