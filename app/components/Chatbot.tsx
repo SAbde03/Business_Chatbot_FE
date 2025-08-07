@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { FiSend, FiUser, FiMessageSquare, FiDownload } from 'react-icons/fi'
+import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2 } from 'react-icons/fi'
 import Message from './message'
 import ProfileCard from './card'
 import Badge from './badge'
 import { Inter, Roboto, Open_Sans } from 'next/font/google'
+import { FileChartLine } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
@@ -187,6 +188,7 @@ export default function Chatbot() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
+  const [isClickedVisualize, setVisualize] = useState(false)
   const [currentStreamingMessageId, setCurrentStreamingMessageId] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -460,6 +462,10 @@ export default function Chatbot() {
     setInputValue(text)
   }
 
+  function handleVisualizeClick(): void {
+    setVisualize(!isClickedVisualize)
+  }
+
   return (
       <div className="flex flex-col items-center col-reverse justify-center h-full">
         <Badge />
@@ -586,14 +592,31 @@ export default function Chatbot() {
           </div>
 
           {/* Input form */}
-          <form onSubmit={handleSubmit} className="min-w-[60%] p-4 rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+          <form onSubmit={handleSubmit} className="min-w-[60%] p-4 pb-0.5 rounded-4xl bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
             {/* Button container */}
-            <div className="flex gap-3 mb-3 pl-3">
+            
+            {/* Input group */}
+            <div className="flex">
+              <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Ecrivez votre message..."}
+                  disabled={isStreaming}
+                  className={`flex-1 w-0 min-w-[100px] px-4 py-2  mb-3 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words ${
+                      isStreaming ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+              />
+              
+            </div>
+            <div >
+              <div className="flex justify-between h-10">
+                  <div className="flex gap-3  pl-3 w-fit pt-1">
               <button
                   type="button"
                   onClick={handleB2BClick}
                   disabled={isStreaming}
-                  className={`w-20 h-7 p-1 text-sm rounded-full transition-colors border ${
+                  className={`w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2B
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
@@ -605,7 +628,7 @@ export default function Chatbot() {
                   type="button"
                   onClick={handleB2CClick}
                   disabled={isStreaming}
-                  className={`w-20 h-7 p-1 text-sm rounded-full transition-colors border ${
+                  className={`w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2C
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
@@ -613,31 +636,36 @@ export default function Chatbot() {
               >
                 B2C
               </button>
-            </div>
-
-            {/* Input group */}
-            <div className="flex">
-              <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Ecrivez votre message..."}
-                  disabled={isStreaming}
-                  className={`flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words ${
-                      isStreaming ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-              />
               <button
+                  type="button"
+                  onClick={handleVisualizeClick}
+                  className={`flex justify-center items-center gap-1 w-25 h-7 p-1 text-sm rounded-xl transition-colors border ${
+                      isClickedVisualize
+                          ? 'bg-purple-300/10 text-purple-500 border-purple-500'
+                          : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
+                  } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ><FiBarChart2 className="text-lg "/>
+                Visualize
+              </button>
+
+              </div>
+              
+              <div className='pb-3'>
+                <button
                   type="submit"
                   disabled={isStreaming || !inputValue.trim()}
-                  className={`p-3 px-3 py-3 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none ${
+                  className={`p-3 mr-2 px-2 py-2 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none ${
                       isStreaming || !inputValue.trim() ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
               >
-                <FiSend className="text-lg text-black" />
+                <FiSend className="text-l text-black" />
               </button>
             </div>
-
+              </div>
+            </div>
+            
+              
+                  
 
           </form>
         </div>
