@@ -6,7 +6,9 @@ import Message from './message'
 import ProfileCard from './card'
 import Badge from './badge'
 import { Inter, Roboto, Open_Sans } from 'next/font/google'
-import { FileChartLine } from 'lucide-react'
+import { Building, BuildingIcon, FileChartLine } from 'lucide-react'
+import { BsBuildingFill } from 'react-icons/bs'
+import { BiBuildings } from 'react-icons/bi'
 
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
@@ -597,13 +599,13 @@ export default function Chatbot() {
             
             {/* Input group */}
             <div className="flex">
-              <input
-                  type="text"
+              <textarea
+                  rows={3}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Ecrivez votre message..."}
                   disabled={isStreaming}
-                  className={`flex-1 w-0 min-w-[100px] px-4 py-2  mb-3 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words ${
+                  className={`flex-1 w-0 min-w-[100px] px-4 py-2  mb-3 rounded-l-lg focus:outline-none resize-none bg-transparent break-words field-sizing-content text-white placeholder-zinc-400 break-words overflow-y-auto  ${
                       isStreaming ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
               />
@@ -616,24 +618,24 @@ export default function Chatbot() {
                   type="button"
                   onClick={handleB2BClick}
                   disabled={isStreaming}
-                  className={`w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
+                  className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2B
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
+              ><BiBuildings></BiBuildings>
                 B2B
               </button>
               <button
                   type="button"
                   onClick={handleB2CClick}
                   disabled={isStreaming}
-                  className={`w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
+                  className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2C
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
+              ><FiUser></FiUser>
                 B2C
               </button>
               <button
@@ -641,7 +643,7 @@ export default function Chatbot() {
                   onClick={handleVisualizeClick}
                   className={`flex justify-center items-center gap-1 w-25 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedVisualize
-                          ? 'bg-purple-300/10 text-purple-500 border-purple-500'
+                          ? 'bg-purple-300/10 text-purple-400 border-linear-to-bl from-violet-500 to-fuchsia-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
               ><FiBarChart2 className="text-lg "/>
