@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Chart, plugins, registerables } from 'chart.js';
 import Papa from 'papaparse';
 import { ChartData, CsvRow } from '@/types/chart';
+
 import { FiMail, FiPhone } from 'react-icons/fi';
 import { FaFileLines } from 'react-icons/fa6';
 import { title } from 'process';
@@ -182,8 +183,8 @@ export default function DataAnalysisDashboard() {
           datasets: [{
             data: values,
             backgroundColor: colors,
-            borderWidth: 0,
-            BorderRadius:6
+            borderWidth: 1,
+            
           }]
         });
       }
@@ -342,7 +343,7 @@ export default function DataAnalysisDashboard() {
 
       {analysisResult && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="flex justifiy-center items-center gap-5 bg-linear-90 from-white/20 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
+          <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
             <div className='bg-white/40 w-fit h-fit  p-5  rounded-lg'><FaFileLines></FaFileLines></div>
             <div>
                <h3 className={`font-semibold text-white-700 ${inter.className}`}>Résultats</h3>
@@ -350,7 +351,7 @@ export default function DataAnalysisDashboard() {
               </div>
            
           </div>
-          <div className="flex justifiy-center items-center gap-5 bg-linear-90 from-white/20 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
+          <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
             <div className='bg-white/40 w-fit h-fit  p-5  rounded-lg'><FiPhone></FiPhone></div>
             <div>
                <h3 className="font-semibold text-white-700">Numéro de tel</h3>
@@ -360,7 +361,7 @@ export default function DataAnalysisDashboard() {
             </div>
            
           </div>
-          <div className="flex justifiy-center items-center gap-5 bg-linear-90 from-white/20  to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
+          <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5  to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
             <div className='bg-white/40 w-fit h-fit  p-5  rounded-lg'><FiMail className='text'></FiMail></div>
             <div>
               <h3 className="font-semibold text-white-700">Emails</h3>
@@ -400,6 +401,15 @@ export default function DataAnalysisDashboard() {
           )}
         </div>
       </div>
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 h-150">
+        <div className="bg-white/10 border-white p-4 border border-white/20 rounded-lg shadow-sm">
+         
+        </div>
+
+        
+      </div>
+      
     </div>
+    
   );
 }

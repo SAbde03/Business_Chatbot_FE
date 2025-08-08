@@ -6,10 +6,15 @@ import Message from './message'
 import ProfileCard from './card'
 import Badge from './badge'
 import { Inter, Roboto, Open_Sans } from 'next/font/google'
-import { Building, BuildingIcon, FileChartLine } from 'lucide-react'
+import { Building, BuildingIcon, FileChartLine, PieChart } from 'lucide-react'
 import { BsBuildingFill } from 'react-icons/bs'
 import { BiBuildings } from 'react-icons/bi'
-
+import { RxCross1 } from "react-icons/rx";
+import { BsFillBuildingsFill } from "react-icons/bs";
+import { AiFillCloseCircle } from 'react-icons/ai'
+import DataAnalysisDashboard from "./charts/piechart";
+import { FaUser } from "react-icons/fa";
+import { IoStatsChartSharp } from 'react-icons/io5'
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
 const openSans = Open_Sans({ subsets: ['latin'] })
@@ -465,11 +470,28 @@ export default function Chatbot() {
   }
 
   function handleVisualizeClick(): void {
-    setVisualize(!isClickedVisualize)
+    setpopIsOpen(!popupIsOpen)
   }
+  const [popupIsOpen, setpopIsOpen] = useState(true);
 
   return (
-      <div className="flex flex-col items-center col-reverse justify-center h-full">
+    
+      <div className="flex flex-col items-center col-reverse justify-center h-full" >
+        <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90' }`}>
+        {popupIsOpen ? (
+          <>
+          <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
+            <button className='absolute right-8 bg-zinc' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
+            <div className='h-fit'>
+              <DataAnalysisDashboard/>
+              
+            </div>
+            </div>
+            </>
+            ):null
+          
+        }
+          </div>
         <Badge />
         <div className={`${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
           Marketing Expert
@@ -623,7 +645,7 @@ export default function Chatbot() {
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
-              ><BiBuildings></BiBuildings>
+              ><BsFillBuildingsFill />
                 B2B
               </button>
               <button
@@ -635,7 +657,7 @@ export default function Chatbot() {
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
-              ><FiUser></FiUser>
+              ><FaUser />
                 B2C
               </button>
               <button
@@ -646,8 +668,8 @@ export default function Chatbot() {
                           ? 'bg-purple-300/10 text-purple-400 border-linear-to-bl from-violet-500 to-fuchsia-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
-              ><FiBarChart2 className="text-lg "/>
-                Visualize
+              ><IoStatsChartSharp />
+                Visualiser
               </button>
 
               </div>
