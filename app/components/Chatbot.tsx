@@ -1,13 +1,23 @@
 'use client'
-import {useState, useRef, useEffect, useCallback} from 'react'
-import { FiSend, FiDownload } from 'react-icons/fi'
-import Message from './message'
-import Badge from './badge'
-import {Inter, Roboto} from 'next/font/google'
 
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2 } from 'react-icons/fi'
+import Message from './message'
+import ProfileCard from './card'
+import Badge from './badge'
+import { Inter, Roboto, Open_Sans } from 'next/font/google'
+import { Building, BuildingIcon, FileChartLine, PieChart } from 'lucide-react'
+import { BsBuildingFill } from 'react-icons/bs'
+import { BiBuildings } from 'react-icons/bi'
+import { RxCross1 } from "react-icons/rx";
+import { BsFillBuildingsFill } from "react-icons/bs";
+import { AiFillCloseCircle } from 'react-icons/ai'
+import DataAnalysisDashboard from "./charts/piechart";
+import { FaUser } from "react-icons/fa";
+import { IoStatsChartSharp } from 'react-icons/io5'
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
-
+const openSans = Open_Sans({ subsets: ['latin'] })
 
 type MessageType = {
   id: string
@@ -50,14 +60,15 @@ class StreamingClient {
     }
 
     try {
-      fetch(
-          `${this.baseUrl}/api/stream`,
-                  {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ input: message})
-                  }
-          ).then(response => {
+      // Utiliser POST avec fetch puis EventSource n'est pas possible
+      // On va faire un POST vers l'endpoint streaming
+      fetch(`${this.baseUrl}/api/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ input: message })
+      }).then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -184,6 +195,7 @@ export default function Chatbot() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
+  const [isClickedVisualize, setVisualize] = useState(false)
   const [currentStreamingMessageId, setCurrentStreamingMessageId] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -457,8 +469,29 @@ export default function Chatbot() {
     setInputValue(text)
   }
 
+  function handleVisualizeClick(): void {
+    setpopIsOpen(!popupIsOpen)
+  }
+  const [popupIsOpen, setpopIsOpen] = useState(true);
+
   return (
-      <div className="flex flex-col items-center col-reverse justify-center h-full">
+
+      <div className="flex flex-col items-center col-reverse justify-center h-full" >
+        <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90' }`}>
+        {popupIsOpen ? (
+          <>
+          <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
+            <button className='absolute right-8 bg-zinc' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
+            <div className='h-fit'>
+              <DataAnalysisDashboard/>
+
+            </div>
+            </div>
+            </>
+            ):null
+
+        }
+          </div>
         <Badge />
         <div className={`${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
           Marketing Expert
@@ -583,57 +616,79 @@ export default function Chatbot() {
           </div>
 
           {/* Input form */}
-          <form onSubmit={handleSubmit} className="min-w-[60%] p-4 rounded-lg bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+          <form onSubmit={handleSubmit} className="min-w-[60%] p-4 pb-0.5 rounded-4xl bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
             {/* Button container */}
-            <div className="flex gap-3 mb-3 pl-3">
+
+            {/* Input group */}
+            <div className="flex">
+              <textarea
+                  rows={3}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Ecrivez votre message..."}
+                  disabled={isStreaming}
+                  className={`flex-1 w-0 min-w-[100px] px-4 py-2  mb-3 rounded-l-lg focus:outline-none resize-none bg-transparent break-words field-sizing-content text-white placeholder-zinc-400 break-words overflow-y-auto  ${
+                      isStreaming ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+              />
+
+            </div>
+            <div >
+              <div className="flex justify-between h-10">
+                  <div className="flex gap-3  pl-3 w-fit pt-1">
               <button
                   type="button"
                   onClick={handleB2BClick}
                   disabled={isStreaming}
-                  className={`w-20 h-7 p-1 text-sm rounded-full transition-colors border ${
+                  className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2B
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
+              ><BsFillBuildingsFill />
                 B2B
               </button>
               <button
                   type="button"
                   onClick={handleB2CClick}
                   disabled={isStreaming}
-                  className={`w-20 h-7 p-1 text-sm rounded-full transition-colors border ${
+                  className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2C
                           ? 'bg-blue-300/10 text-blue-500 border-blue-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
+              ><FaUser />
                 B2C
               </button>
-            </div>
-
-            {/* Input group */}
-            <div className="flex">
-              <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Écrivez votre message..."}
-                  disabled={isStreaming}
-                  className={`flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words ${
-                      isStreaming ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-              />
               <button
+                  type="button"
+                  onClick={handleVisualizeClick}
+                  className={`flex justify-center items-center gap-1 w-25 h-7 p-1 text-sm rounded-xl transition-colors border ${
+                      isClickedVisualize
+                          ? 'bg-purple-300/10 text-purple-400 border-linear-to-bl from-violet-500 to-fuchsia-500'
+                          : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
+                  } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ><IoStatsChartSharp />
+                Visualiser
+              </button>
+
+              </div>
+
+              <div className='pb-3'>
+                <button
                   type="submit"
                   disabled={isStreaming || !inputValue.trim()}
-                  className={`p-3 px-3 py-3 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none ${
+                  className={`p-3 mr-2 px-2 py-2 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none ${
                       isStreaming || !inputValue.trim() ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
               >
-                <FiSend className="text-lg text-black" />
+                <FiSend className="text-l text-black" />
               </button>
             </div>
+              </div>
+            </div>
+
+
 
 
           </form>

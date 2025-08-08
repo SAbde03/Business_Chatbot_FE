@@ -50,7 +50,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
       className={`flex mb-10  ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`relative flex max-w-xs md:max-w-md lg:max-w-2xl ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
+        className={`relative flex max-w-xs md:max-w-md lg:max-w-2xl  ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
       >
         <div
           className={`rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -65,7 +65,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
           className={`px-4 py-2  rounded-lg ${
             message.sender === 'user'
               ? 'bg-zinc-600 text-white rounded-tr-none '
-              : 'bg-gray-1000 text-white-800 rounded-tl-none w-full '
+              : 'bg-gray-1000 text-white-800 rounded-tl-none '
           }`}
         >{isStreaming ?(
             <div className="mt-1 mb-2 text-xs  flex items-center gap-2 ">
