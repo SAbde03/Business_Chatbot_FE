@@ -4,6 +4,7 @@ import { Inter, Roboto, Open_Sans } from 'next/font/google';
 import { AiFillRobot } from 'react-icons/ai';
 import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { RiRobot2Line } from "react-icons/ri";
 import rehypeHighlight from 'rehype-highlight';
 const inter = Inter({ subsets: ['latin'] });
 type MessageProps = {
@@ -54,17 +55,17 @@ export default function Message({ message, isStreaming }: MessageProps) {
       >
         <div
           className={`rounded-full flex items-center justify-center flex-shrink-0 ${
-            message.sender === 'user' ? 'h-0 w-0' : 'w-10 h-10 bg-gray-800 mr-3'
+            message.sender === 'user' ? 'h-0 w-0' : 'w-10 h-10 bg-[#10b981] mr-3'
           }`}
         >
           {message.sender === 'user' ? (null) : (
-            <AiFillRobot className="text-gray-500 text-xl" />
+            <RiRobot2Line className='text-black'/>
           )}
         </div>
         <div
           className={`px-4 py-2  rounded-lg ${
             message.sender === 'user'
-              ? 'bg-zinc-600 text-white rounded-tr-none '
+              ? 'bg-gray-500/10 text-white rounded-tr-none '
               : 'bg-gray-1000 text-white-800 rounded-tl-none '
           }`}
         >{isStreaming ?(

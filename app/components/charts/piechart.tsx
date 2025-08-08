@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Chart, plugins, registerables } from 'chart.js';
 import Papa from 'papaparse';
 import { ChartData, CsvRow } from '@/types/chart';
-
+import FranceMap from './FranceChoropleth';
 import { FiMail, FiPhone } from 'react-icons/fi';
 import { FaFileLines } from 'react-icons/fa6';
 import { title } from 'process';
@@ -21,8 +21,12 @@ type AnalysisResult = {
   phoneNumberPercentage: string;
   emailPercentage: string;
 };
+interface DashboardProps{
+  isB2Bcliked?:boolean,
+  isB2Cclicked?:boolean,
+}
 
-export default function DataAnalysisDashboard() {
+export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:DashboardProps) {
   const [genderChartData, setGenderChartData] = useState<ChartData | null>(null);
   const [completionChartData, setCompletionChartData] = useState<ChartData | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -322,10 +326,11 @@ export default function DataAnalysisDashboard() {
   }, [genderChartData, completionChartData, analysisResult]);
 
   return (
+    
     <div className="max-w-full h-full mx-auto p-4 space-y-8">
       
-      
-      <div className="mb-6">
+      {isB2Cclicked ? (<>
+        <div className="mb-6">
         <input
           type="file"
           accept=".csv, text/csv"
@@ -340,11 +345,11 @@ export default function DataAnalysisDashboard() {
         />
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </div>
-
+       
       {analysisResult && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
-            <div className='bg-white/40 w-fit h-fit  p-5  rounded-lg'><FaFileLines></FaFileLines></div>
+            <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FaFileLines></FaFileLines></div>
             <div>
                <h3 className={`font-semibold text-white-700 ${inter.className}`}>Résultats</h3>
                 <p className="text-2xl font-bold text-white-400">{analysisResult.totalEntries}</p>
@@ -352,7 +357,7 @@ export default function DataAnalysisDashboard() {
            
           </div>
           <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
-            <div className='bg-white/40 w-fit h-fit  p-5  rounded-lg'><FiPhone></FiPhone></div>
+            <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FiPhone></FiPhone></div>
             <div>
                <h3 className="font-semibold text-white-700">Numéro de tel</h3>
             <p className="text-2xl font-bold text-white-800">
@@ -362,7 +367,7 @@ export default function DataAnalysisDashboard() {
            
           </div>
           <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5  to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
-            <div className='bg-white/40 w-fit h-fit  p-5  rounded-lg'><FiMail className='text'></FiMail></div>
+            <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FiMail className='text'></FiMail></div>
             <div>
               <h3 className="font-semibold text-white-700">Emails</h3>
             <p className="text-2xl font-bold text-white-800">
@@ -375,7 +380,7 @@ export default function DataAnalysisDashboard() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/10 border-white p-4 border border-white/20 rounded-lg shadow-sm">
+        <div className="bg-white/5 border-white p-4 border border-white/10 rounded-lg shadow-sm">
           <h2 className="text-lg font-semibold text-white mb-4">Distribution de genres</h2>
           {genderChartData ? (
             <div className="relative h-80">
@@ -388,7 +393,7 @@ export default function DataAnalysisDashboard() {
           )}
         </div>
 
-        <div className="bg-white/10  bg-opacity-70 p-4 border border-white/20 rounded-lg  shadow-sm">
+        <div className="bg-white/5  bg-opacity-70 p-4 border border-white/10 rounded-lg  shadow-sm">
           <h2 className="text-lg font-semibold text-white mb-4">Validité des données</h2>
           {completionChartData ? (
             <div className="relative h-80">
@@ -402,12 +407,13 @@ export default function DataAnalysisDashboard() {
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 h-150">
-        <div className="bg-white/10 border-white p-4 border border-white/20 rounded-lg shadow-sm">
-         
+        <div className="bg-white/5 border-white p-4 border border-white/10 rounded-lg shadow-sm">
+       
         </div>
 
         
-      </div>
+      </div></>):(null)}
+      
       
     </div>
     

@@ -276,7 +276,7 @@ export default function Chatbot() {
           if (msg.id === streamingMessageId) {
             return {
               ...msg,
-              text: `Erreur: ${error}`,
+              text: `${error}`,
               isStreaming: false,
               streamingComplete: true
             }
@@ -416,7 +416,7 @@ export default function Chatbot() {
       }
     }
     } catch (error) {
-      console.error('Error:', error)
+      console.error(error)
       const errorMessage: MessageType = {
         id: Date.now().toString(),
         text: 'Désolé, j\'ai rencontré un problème.',
@@ -477,13 +477,13 @@ export default function Chatbot() {
   return (
     
       <div className="flex flex-col items-center col-reverse justify-center h-full" >
-        <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90' }`}>
+        <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`}>
         {popupIsOpen ? (
           <>
           <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
             <button className='absolute right-8 bg-zinc' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
             <div className='h-fit'>
-              <DataAnalysisDashboard/>
+              <DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C}/>
               
             </div>
             </div>
@@ -642,7 +642,7 @@ export default function Chatbot() {
                   disabled={isStreaming}
                   className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2B
-                          ? 'bg-blue-300/10 text-blue-500 border-blue-500'
+                          ? 'bg-[#10b981]/10 text-[#10b981]/80 border-[#10b981]/60' //text-blue-500 border-blue-500 //text-lime-200 border-lime-200
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
               ><BsFillBuildingsFill />
@@ -654,7 +654,7 @@ export default function Chatbot() {
                   disabled={isStreaming}
                   className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2C
-                          ? 'bg-blue-300/10 text-blue-500 border-blue-500'
+                          ? 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]' //text-blue-500 border-blue-500 //text-lime-200 border-lime-200
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
               ><FaUser />
@@ -678,7 +678,7 @@ export default function Chatbot() {
                 <button
                   type="submit"
                   disabled={isStreaming || !inputValue.trim()}
-                  className={`p-3 mr-2 px-2 py-2 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none ${
+                  className={`p-3 mr-0 px-2 py-2 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none ${
                       isStreaming || !inputValue.trim() ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
               >

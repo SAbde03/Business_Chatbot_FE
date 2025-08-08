@@ -36,7 +36,7 @@ export default function Sidebar() {
       <div className="flex justify-between items-center p-4 ">
         {isSidebarOpen ? (
           <span className="text-zinc-300 text-lg font-semibold whitespace-nowrap">
-            ChatBot
+            
           </span>
         ) : (
           null
@@ -44,7 +44,7 @@ export default function Sidebar() {
         
         <button 
           onClick={toggleSidebar}
-          className="p-2 rounded-lg hover:bg-gray-700 text-zinc-300 hover:text-white transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-500/10 text-zinc-300 hover:text-white transition-colors"
         >
           {isSidebarOpen ? <FiSidebar size={20} /> : <FiSidebar size={20} />}
         </button>
@@ -54,15 +54,15 @@ export default function Sidebar() {
       <div className="p-4 ">
         <button 
           //onClick={createNewChat}
-          className={`flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors ${isSidebarOpen ? 'w-full py-2 px-4' : 'w-10 h-10 p-0'}`}
+          className={`flex items-center justify-center rounded-lg bg-[#10b981] hover:bg-[#16805c] text-black transition-colors ${isSidebarOpen ? 'w-full py-2 px-4' : 'w-10 h-10 p-0'}`}
         >
           {isSidebarOpen ? (
             <>
-              <FiMessageSquare className="mr-2" />
+              <FiMessageSquare className="mr-2 " />
               New Chat
             </>
           ) : (
-            <FiMessageSquare size={20} />
+            <FiMessageSquare className="text-black" size={20} />
           )}
         </button>
       </div>
