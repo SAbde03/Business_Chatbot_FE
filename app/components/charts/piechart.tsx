@@ -57,7 +57,6 @@ export default function CsvToPieChart() {
       return;
     }
 
-    // Get first two columns
     const columns = Object.keys(data[0]);
     if (columns.length < 2) {
       setError('CSV needs at least two columns (labels and values)');

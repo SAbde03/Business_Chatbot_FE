@@ -1,15 +1,13 @@
 'use client'
-
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { FiSend, FiUser, FiMessageSquare, FiDownload } from 'react-icons/fi'
+import {useState, useRef, useEffect, useCallback} from 'react'
+import { FiSend, FiDownload } from 'react-icons/fi'
 import Message from './message'
-import ProfileCard from './card'
 import Badge from './badge'
-import { Inter, Roboto, Open_Sans } from 'next/font/google'
+import {Inter, Roboto} from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
-const openSans = Open_Sans({ subsets: ['latin'] })
+
 
 type MessageType = {
   id: string
@@ -52,15 +50,14 @@ class StreamingClient {
     }
 
     try {
-      // Utiliser POST avec fetch puis EventSource n'est pas possible
-      // On va faire un POST vers l'endpoint streaming
-      fetch(`${this.baseUrl}/api/stream`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ input: message })
-      }).then(response => {
+      fetch(
+          `${this.baseUrl}/api/stream`,
+                  {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ input: message})
+                  }
+          ).then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -621,7 +618,7 @@ export default function Chatbot() {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Ecrivez votre message..."}
+                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Écrivez votre message..."}
                   disabled={isStreaming}
                   className={`flex-1 w-0 min-w-[100px] px-4 py-2 rounded-l-lg focus:outline-none bg-transparent text-white placeholder-zinc-400 break-words ${
                       isStreaming ? 'opacity-50 cursor-not-allowed' : ''
