@@ -163,13 +163,13 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
       if (femaleCount > 0) {
         labels.push('Femme');
         values.push(femaleCount);
-        colors.push('#FF6384');
+        colors.push('#10b981');
       }
       
       if (maleCount > 0) {
         labels.push('Homme');
         values.push(maleCount);
-        colors.push('#36A2EB');
+        colors.push('#caffd8ff');
       }
       
       if (otherCount > 0) {
@@ -187,7 +187,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
           datasets: [{
             data: values,
             backgroundColor: colors,
-            borderWidth: 1,
+            borderWidth: 0,
             
           }]
         });
@@ -348,7 +348,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
        
       {analysisResult && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
+          <div className="flex justifiy-center items-center gap-5 bg-[#10b981]/10  bg-opacity-20 p-4 rounded-lg border border-[#10b981]/40 ">
             <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FaFileLines></FaFileLines></div>
             <div>
                <h3 className={`font-semibold text-white-700 ${inter.className}`}>Résultats</h3>
@@ -356,17 +356,17 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
               </div>
            
           </div>
-          <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5 to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
+          <div className="flex justifiy-center items-center gap-5 bg-[#10b981]/10  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40 ">
             <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FiPhone></FiPhone></div>
             <div>
-               <h3 className="font-semibold text-white-700">Numéro de tel</h3>
+               <h3 className="font-semibold text-white-700">Numéros de téléphone</h3>
             <p className="text-2xl font-bold text-white-800">
               {analysisResult.filledPhoneNumbers} <span className="text-sm text-white/50">({analysisResult.phoneNumberPercentage}%)</span>
             </p>
             </div>
            
           </div>
-          <div className="flex justifiy-center items-center gap-5 bg-linear-360 from-white/5  to-zinc drop-shadow-zinc bg-opacity-70 p-4 rounded-lg ">
+          <div className="flex justifiy-center items-center gap-5 bg-[#10b981]/10  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40 ">
             <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FiMail className='text'></FiMail></div>
             <div>
               <h3 className="font-semibold text-white-700">Emails</h3>
@@ -380,7 +380,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/5 border-white p-4 border border-white/10 rounded-lg shadow-sm">
+        <div className="bg-white/5 p-4 border border-white/10 rounded-lg shadow-sm">
           <h2 className="text-lg font-semibold text-white mb-4">Distribution de genres</h2>
           {genderChartData ? (
             <div className="relative h-80">

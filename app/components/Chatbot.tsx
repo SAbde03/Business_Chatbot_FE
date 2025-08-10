@@ -114,7 +114,7 @@ class StreamingClient {
           } catch (error) {
             console.error('Stream reading error:', error);
             this.isConnected = false;
-            if (callbacks.onError) callbacks.onError(error.toString());
+            //if (callbacks.onError) callbacks.onError(error.toString());
           }
         };
 
@@ -126,7 +126,7 @@ class StreamingClient {
 
     } catch (error) {
       console.error('Failed to start stream:', error);
-      if (callbacks.onError) callbacks.onError(error.toString());
+      //if (callbacks.onError) callbacks.onError(error.toString());
     }
   }
 
@@ -409,7 +409,7 @@ export default function Chatbot() {
           isClickedB2C: isClickedB2C,
           datatype: isClickedB2B ? 'b2b' : 'b2c',
           status: true,
-          headers: finalData.csv.split('\n')[0].split(';'),
+         
         };
         
         setMessages(prev => [...prev.filter(msg => msg.id !== tempMessage.id), botMessage]);
@@ -472,7 +472,7 @@ export default function Chatbot() {
   function handleVisualizeClick(): void {
     setpopIsOpen(!popupIsOpen)
   }
-  const [popupIsOpen, setpopIsOpen] = useState(true);
+  const [popupIsOpen, setpopIsOpen] = useState(false);
 
   return (
     
@@ -481,7 +481,7 @@ export default function Chatbot() {
         {popupIsOpen ? (
           <>
           <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
-            <button className='absolute right-8 bg-zinc' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
+            <button className='absolute right-8 p-1 rounded-full hover:bg-gray-500/60' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
             <div className='h-fit'>
               <DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C}/>
               
