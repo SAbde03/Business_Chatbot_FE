@@ -9,11 +9,20 @@ import { FaFileLines } from 'react-icons/fa6';
 import { title } from 'process';
 import { BiBorderRadius } from 'react-icons/bi';
 import { Inter, Roboto, Open_Sans } from 'next/font/google'
+import { BsFillTelephoneFill } from 'react-icons/bs';
+import { AiFillMail } from 'react-icons/ai';
+import { csv } from 'd3';
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
 const openSans = Open_Sans({ subsets: ['latin'] })
 Chart.register(...registerables);
 
+const csvString = `idS,userId,phoneNumber,firstName,lastName,gender,currentCity,currentCountry,email,currentDepartment,currentRegion,hometownCity,hometownCountry,workplace,relationshipStatus
+6.17E+11,4.97E+16,3363080194,Mohamed,Rhal,male,Paris,france,aurlie.contesse@hopitalmilitairesainteanne.com,Paris,ile-de-France,Hirson,france,hopital militaire sainte anne,married
+1.78E+11,1.84E+18,3363080194,Aurélie,Contesse,female,Paris,france,aurlie.contesse@hopitalmilitairesainteanne.com,Paris,ile-de-France,Hirson,france,hopital militaire sainte anne,married
+7.32E+11,1.78E+18,3363391068,Esmir Hr,Dolce Habibi,male,Paris,france,esmirhr.dolcehabibi@gucci.com,Paris,ile-de-France,Budapest,hungary,gucci,married
+54955659155,2.16E+18,3366202734,Arie,Miles,male,Paris,france,arie.miles@yahoo.com,Paris,ile-de-France,Budapest,hungary,gucci,married
+8.11E+11,1.61E+18,3363559779,Sonia,Sofiane,female,Paris,france,sonia.sofiane@hm.com,Paris,ile-de-France,Paris,france,h&m,married`;
 type AnalysisResult = {
   filledPhoneNumbers: number;
   filledEmails: number;
@@ -24,9 +33,10 @@ type AnalysisResult = {
 interface DashboardProps{
   isB2Bcliked?:boolean,
   isB2Cclicked?:boolean,
+  csvFile:string,
 }
 
-export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:DashboardProps) {
+export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile}:DashboardProps) {
   const [genderChartData, setGenderChartData] = useState<ChartData | null>(null);
   const [completionChartData, setCompletionChartData] = useState<ChartData | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -37,30 +47,12 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
   const completionChartInstanceRef = useRef<Chart<'bar'> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Clean up charts on unmount
+  
+
   useEffect(() => {
-    return () => {
-      if (genderChartInstanceRef.current) {
-        genderChartInstanceRef.current.destroy();
-      }
-      if (completionChartInstanceRef.current) {
-        completionChartInstanceRef.current.destroy();
-      }
-    };
-  }, []);
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    if (!file.name.endsWith('.csv') && file.type !== 'text/csv') {
-      setError('Please upload a valid CSV file');
-      return;
-    }
 
     setError('');
-    Papa.parse<CsvRow>(file, {
+    Papa.parse<CsvRow>(csvString, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
@@ -74,7 +66,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
         setError(`Error parsing CSV: ${error.message}`);
       }
     });
-  };
+  }, [csvFile]);
 
   const analyzeDataCompletion = (data: CsvRow[]): AnalysisResult => {
     let filledPhoneNumbers = 0;
@@ -122,7 +114,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
         {
           label: 'Fournies',
           data: [analysis.filledPhoneNumbers, analysis.filledEmails],
-          backgroundColor: ['rgb(255, 255, 255)', 'rgb(255, 255, 255)'],
+          backgroundColor: ['#10b981', '#10b981'],
           borderColor: ['rgb(255, 255, 255)', 'rgb(255, 255, 255)'],
           borderWidth: 1,
         },
@@ -329,35 +321,22 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
     
     <div className="max-w-full h-full mx-auto p-4 space-y-8">
       
+      
       {isB2Cclicked ? (<>
-        <div className="mb-6">
-        <input
-          type="file"
-          accept=".csv, text/csv"
-          onChange={handleFileUpload}
-          ref={fileInputRef}
-          className="block w-full text-sm text-zinc-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-zinc-900
-            hover:file:bg-blue-100"
-        />
-        {error && <p className="text-red-500 mt-2">{error}</p>}
-      </div>
+        
        
       {analysisResult && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="flex justifiy-center items-center gap-5 bg-[#10b981]/10  bg-opacity-20 p-4 rounded-lg border border-[#10b981]/40 ">
-            <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FaFileLines></FaFileLines></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-6">
+          <div className="flex justifiy-center items-center gap-5  bg-[#10b981]/70 bg-radial-[at_25%_25%] from-[#10b981]/70 to-[#3bb861] to-75%  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40">
+            <div className='bg-white/30 w-fit h-fit  p-5  rounded-full'><FaFileLines></FaFileLines></div>
             <div>
                <h3 className={`font-semibold text-white-700 ${inter.className}`}>Résultats</h3>
                 <p className="text-2xl font-bold text-white-400">{analysisResult.totalEntries}</p>
               </div>
            
           </div>
-          <div className="flex justifiy-center items-center gap-5 bg-[#10b981]/10  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40 ">
-            <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FiPhone></FiPhone></div>
+          <div className="flex justifiy-center items-center gap-5  bg-[#10b981]/70 bg-radial-[at_5%_25%] from-[#10b981]/70 to-[#3bb861] to-75%  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40">
+            <div className='bg-white/30 w-fit h-fit  p-5  rounded-full'><BsFillTelephoneFill></BsFillTelephoneFill></div>
             <div>
                <h3 className="font-semibold text-white-700">Numéros de téléphone</h3>
             <p className="text-2xl font-bold text-white-800">
@@ -366,8 +345,8 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
             </div>
            
           </div>
-          <div className="flex justifiy-center items-center gap-5 bg-[#10b981]/10  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40 ">
-            <div className='bg-white/10 w-fit h-fit  p-5  rounded-lg'><FiMail className='text'></FiMail></div>
+          <div className="flex justifiy-center items-center gap-5  bg-[#10b981]/70 bg-radial-[at_25%_25%] from-[#10b981]/70 to-[#3bb861] to-75%  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40">
+            <div className='bg-white/30 w-fit h-fit  p-5  rounded-full'><AiFillMail className='text'></AiFillMail></div>
             <div>
               <h3 className="font-semibold text-white-700">Emails</h3>
             <p className="text-2xl font-bold text-white-800">
@@ -384,7 +363,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
           <h2 className="text-lg font-semibold text-white mb-4">Distribution de genres</h2>
           {genderChartData ? (
             <div className="relative h-80">
-              <canvas ref={genderChartRef}></canvas>
+              <canvas id="chart1" ref={genderChartRef}></canvas>
             </div>
           ) : (
             <div className="text-center py-12 text-white-500">
@@ -394,10 +373,10 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
         </div>
 
         <div className="bg-white/5  bg-opacity-70 p-4 border border-white/10 rounded-lg  shadow-sm">
-          <h2 className="text-lg font-semibold text-white mb-4">Validité des données</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Validité de données</h2>
           {completionChartData ? (
             <div className="relative h-80">
-              <canvas ref={completionChartRef}></canvas>
+              <canvas id="chart2" ref={completionChartRef}></canvas>
             </div>
           ) : (
             <div className="text-center py-12 text-white">
@@ -408,11 +387,12 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked}:Dashbo
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 h-150">
         <div className="bg-white/5 border-white p-4 border border-white/10 rounded-lg shadow-sm">
-       
+          <FranceMap csvFile={csvString} />
         </div>
 
         
-      </div></>):(null)}
+      </div>
+      </>):(null)}
       
       
     </div>

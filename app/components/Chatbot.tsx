@@ -26,7 +26,7 @@ type MessageType = {
   timestamp: Date
   cardData?: string[]
   isClicked?: boolean
-  data?: any
+  data: string
   analysis?: string
   isCard?: boolean
   isClickedB2B?: boolean
@@ -191,6 +191,7 @@ export default function Chatbot() {
       text: 'Bonjour, comment puis-je vous aider?',
       sender: 'bot',
       timestamp: new Date(),
+      data:'',
     },
   ])
   const [inputValue, setInputValue] = useState('')
@@ -230,7 +231,8 @@ export default function Chatbot() {
       sender: 'bot',
       timestamp: new Date(),
       isStreaming: true,
-      streamingComplete: false
+      streamingComplete: false,
+      data:'',
     }
 
     setMessages(prev => [...prev, initialBotMessage])
@@ -307,6 +309,7 @@ export default function Chatbot() {
       sender: 'user',
       timestamp: new Date(),
       isCard: false,
+      data:'',
     }
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
@@ -336,7 +339,8 @@ export default function Chatbot() {
         sender: 'bot',
         isCard: false,
         timestamp: new Date(),
-        status: false
+        status: false,
+        data:''
       };
       setMessages(prev => [...prev, tempMessage]);
 
@@ -422,6 +426,7 @@ export default function Chatbot() {
         text: 'Désolé, j\'ai rencontré un problème.',
         sender: 'bot',
         timestamp: new Date(),
+        data:''
       }
       setMessages(prev => [...prev, errorMessage])
       setIsStreaming(false)
@@ -483,7 +488,7 @@ export default function Chatbot() {
           <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
             <button className='absolute right-8 p-1 rounded-full hover:bg-gray-500/60' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
             <div className='h-fit'>
-              <DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C}/>
+              {messages.map((message) => (<DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C} csvFile={message.data}/>))}
               
             </div>
             </div>
@@ -663,7 +668,7 @@ export default function Chatbot() {
               <button
                   type="button"
                   onClick={handleVisualizeClick}
-                  className={`flex justify-center items-center gap-1 w-25 h-7 p-1 text-sm rounded-xl transition-colors border ${
+                  className={`flex justify-center items-center gap-1 w-25 h-7 p-1 text-sm rounded-full transition-colors  ${
                       isClickedVisualize
                           ? 'bg-purple-300/10 text-purple-400 border-linear-to-bl from-violet-500 to-fuchsia-500'
                           : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
