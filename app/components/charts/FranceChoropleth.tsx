@@ -262,19 +262,19 @@ const normalizeRegionName = (region: string): string | null => {
               <h3 className="text-white text-sm font-semibold mb-2">Nombre de personnes</h3>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-emerald-500 rounded"></div>
+                  <div className="w-3 h-3 bg-emerald-800 rounded"></div>
                   <span className="text-white text-xs">80-100%</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-emerald-600 rounded"></div>
+                  <div className="w-3 h-3 bg-emerald-700 rounded"></div>
                   <span className="text-white text-xs">60-80%</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-emerald-700 rounded"></div>
+                  <div className="w-3 h-3 bg-emerald-600 rounded"></div>
                   <span className="text-white text-xs">40-60%</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-emerald-800 rounded"></div>
+                  <div className="w-3 h-3 bg-emerald-500 rounded"></div>
                   <span className="text-white text-xs">20-40%</span>
                 </div>
               </div>
