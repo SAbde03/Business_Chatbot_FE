@@ -19,12 +19,12 @@ export default function Home() {
   return (
     <main className="flex min-h-screen bg-zinc-800">
       
-        <Sidebar/>
-      <div className="flex-1 flex  justify-center items-start p-4 md:p-5">
+       
+      
     <div className="w-full max-w-full">
       <Chatbot />
     </div>
-  </div>
+  
  
   
     </main>

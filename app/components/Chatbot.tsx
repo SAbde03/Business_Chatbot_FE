@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2 } from 'react-icons/fi'
+import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, FiMoreHorizontal } from 'react-icons/fi'
 import Message from './message'
 import ProfileCard from './card'
 import Badge from './badge'
@@ -18,7 +18,11 @@ import { IoStatsChartSharp } from 'react-icons/io5'
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
 const openSans = Open_Sans({ subsets: ['latin'] })
-
+type Chat = {
+  id: string
+  name: string
+  messages: MessageType[]
+}
 type MessageType = {
   id: string
   text: string
@@ -186,7 +190,9 @@ export default function Chatbot() {
   const [status, setStatus] = useState(true)
   const [isClickedB2B, setIsClickedB2B] = useState(false)
   const [isClickedB2C, setIsClickedB2C] = useState(false)
-  const [messages, setMessages] = useState<MessageType[]>([
+  const [activeChatId, setActiveChatId] = useState('1');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  /*const [messages, setMessages] = useState<MessageType[]>([
     {
       id: '1',
       text: 'Bonjour, comment puis-je vous aider?',
@@ -194,7 +200,24 @@ export default function Chatbot() {
       timestamp: new Date(),
       data:'',
     },
-  ])
+  ])*/
+  const [chats, setChats] = useState<Chat[]>([
+  {
+    id: '1',
+    name: 'Conversation 1',
+    messages: [
+      {
+        id: '1',
+        text: 'Bonjour, comment puis-je vous aider?',
+        sender: 'bot',
+        timestamp: new Date(),
+        data: '',
+      },
+    ],
+  },
+]);
+const activeChat = chats.find(chat => chat.id === activeChatId);
+const messages = activeChat ? activeChat.messages : [];
   const [inputValue, setInputValue] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [isClickedVisualize, setVisualize] = useState(false)
@@ -220,11 +243,32 @@ export default function Chatbot() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
-
-  const handleStreamingResponse = useCallback((userMessage: MessageType) => {
+  const appendMessage = (chatId: string, message: MessageType) => {
+    setChats(prev =>
+      prev.map(chat =>
+        chat.id === chatId
+          ? { ...chat, messages: [...chat.messages, message] }
+          : chat
+      )
+    )
+  }
+  const updateMessage = (chatId: string, messageId: string, updater: (msg: MessageType) => MessageType) => {
+    setChats(prev =>
+      prev.map(chat =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              messages: chat.messages.map(msg =>
+                msg.id === messageId ? updater(msg) : msg
+              ),
+            }
+          : chat
+      )
+    )
+  }
+  const handleStreamingResponse = useCallback((chatId: string, userMessage: MessageType) => {
     if (!streamingClient.current) return
 
-    // Créer un message bot initial pour le streaming
     const streamingMessageId = `streaming-${Date.now()}`
     const initialBotMessage: MessageType = {
       id: streamingMessageId,
@@ -233,67 +277,38 @@ export default function Chatbot() {
       timestamp: new Date(),
       isStreaming: true,
       streamingComplete: false,
-      data:'',
+      data: '',
     }
 
-    setMessages(prev => [...prev, initialBotMessage])
-    setCurrentStreamingMessageId(streamingMessageId)
+    appendMessage(chatId, initialBotMessage)
     setIsStreaming(true)
 
-    const callbacks = {
-      onConnect: () => {
-        console.log('Connected to streaming service')
-      },
-
+     const callbacks = {
       onChunk: (chunk: string) => {
-        setMessages(prev => prev.map(msg => {
-          if (msg.id === streamingMessageId) {
-            return {
-              ...msg,
-              text: msg.text + chunk,
-              isStreaming: true
-            }
-          }
-          return msg
+        updateMessage(chatId, streamingMessageId, msg => ({
+          ...msg,
+          text: msg.text + chunk,
+          isStreaming: true,
         }))
       },
-
       onComplete: (fullResponse: string) => {
-        setMessages(prev => prev.map(msg => {
-          if (msg.id === streamingMessageId) {
-            return {
-              ...msg,
-              text: fullResponse,
-              isStreaming: false,
-              streamingComplete: true
-            }
-          }
-          return msg
+        updateMessage(chatId, streamingMessageId, msg => ({
+          ...msg,
+          text: fullResponse,
+          isStreaming: false,
+          streamingComplete: true,
         }))
         setIsStreaming(false)
-        setCurrentStreamingMessageId(null)
       },
-
       onError: (error: string) => {
-        setMessages(prev => prev.map(msg => {
-          if (msg.id === streamingMessageId) {
-            return {
-              ...msg,
-              text: `${error}`,
-              isStreaming: false,
-              streamingComplete: true
-            }
-          }
-          return msg
+        updateMessage(chatId, streamingMessageId, msg => ({
+          ...msg,
+          text: error,
+          isStreaming: false,
+          streamingComplete: true,
         }))
         setIsStreaming(false)
-        setCurrentStreamingMessageId(null)
       },
-
-      onHeartbeat: () => {
-        // Optionnellement afficher un indicateur de vie
-        console.log('Heartbeat received')
-      }
     }
 
     streamingClient.current.startStream(userMessage.text, callbacks)
@@ -312,13 +327,20 @@ export default function Chatbot() {
       isCard: false,
       data:'',
     }
-    setMessages(prev => [...prev, userMessage])
+    setChats(prevChats =>
+    prevChats.map(chat =>
+    chat.id === activeChatId
+      ? { ...chat, messages: [...chat.messages, userMessage] }
+      : chat
+  )
+);
+
     setInputValue('')
 
    try {
       // Si c'est une requête par défaut, utiliser le streaming
       if (!isClickedB2B && !isClickedB2C) {
-        handleStreamingResponse(userMessage)
+        handleStreamingResponse(activeChatId, userMessage)
       } else {
         // Pour B2B et B2C, utiliser l'ancienne méthode
        const response = await fetch('http://localhost:3002/api/crew', {
@@ -344,7 +366,14 @@ export default function Chatbot() {
         data:'',
         isError:false
       };
-      setMessages(prev => [...prev, tempMessage]);
+      setChats(prevChats =>
+      prevChats.map(chat =>
+      chat.id === activeChatId
+      ? { ...chat, messages: [...chat.messages, tempMessage] }
+      : chat
+        )
+      );
+
 
       // Lecture du flux SSE
       const reader = response.body?.getReader();
@@ -367,13 +396,21 @@ export default function Chatbot() {
             
             // Mise à jour du statut
             if (data.status === 'processing') {
-              setMessages(prev => prev.map(msg => 
-                msg.id === tempMessage.id 
-                  ? { ...msg, text: data.message, progress: data.progress } 
+              setChats(prevChats =>
+                  prevChats.map(chat =>
+                  chat.id === activeChatId
+                    ? {
+                    ...chat,
+                    messages: chat.messages.map(msg =>
+                    msg.id === tempMessage.id
+                   ? { ...msg, text: data.message, progress: data.progress }
                   : msg
-              ));
-            }
-
+                ),
+                   }
+                     : chat
+                  )
+                );
+              }
             // Stockage des données finales
             if (data.status === 'success') {
               finalData = {
@@ -385,11 +422,20 @@ export default function Chatbot() {
 
             // Gestion des erreurs
             if (data.status === 'error') {
-              setMessages(prev => prev.map(msg => 
-                msg.id === tempMessage.id 
-                  ? { ...msg, text: `Erreur`, isError: true,} 
-                  : msg
-              ));
+             setChats(prevChats =>
+              prevChats.map(chat =>
+              chat.id === activeChatId
+                ? {
+               ...chat,
+                messages: chat.messages.map(msg =>
+                msg.id === tempMessage.id
+              ? { ...msg, text: "Erreur", isError: true }
+              : msg
+             ),
+          }
+         : chat
+        )
+);
               setStatus(true)
               
               return;
@@ -419,7 +465,20 @@ export default function Chatbot() {
           status: true,
         };
         
-        setMessages(prev => [...prev.filter(msg => msg.id !== tempMessage.id), botMessage]);
+        setChats(prevChats =>
+  prevChats.map(chat =>
+    chat.id === activeChatId
+      ? {
+          ...chat,
+          messages: [
+            ...chat.messages.filter(msg => msg.id !== tempMessage.id),
+            botMessage,
+          ],
+        }
+      : chat
+  )
+);
+
       }
     }
     } catch (error) {
@@ -432,7 +491,14 @@ export default function Chatbot() {
         timestamp: new Date(),
         data:''
       }
-      setMessages(prev => [...prev, errorMessage])
+      setChats(prevChats =>
+        prevChats.map(chat =>
+        chat.id === activeChatId
+      ? { ...chat, messages: [...chat.messages, errorMessage] }
+      : chat
+  )
+);
+
       setIsStreaming(false)
       setCurrentStreamingMessageId(null)
     }
@@ -483,10 +549,93 @@ export default function Chatbot() {
     setpopIsOpen(!popupIsOpen)
   }
   const [popupIsOpen, setpopIsOpen] = useState(false);
-
+  const handleNewChat = () => {
+    const newId = Date.now().toString()
+    const newChat: Chat = {
+      id: newId,
+      name: `Conversation ${chats.length + 1}`,
+      messages: [
+        {
+          id: '1',
+          text: 'Bonjour, comment puis-je vous aider?',
+          sender: 'bot',
+          timestamp: new Date(),
+          data: '',
+        },
+      ],
+    }
+    setChats(prev => [...prev, newChat])
+    setActiveChatId(newId)
+  }
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
   return (
-    
-      <div className="flex flex-col items-center col-reverse justify-center h-full" >
+      
+      <div className="flex items-center bg-zinc-800 w-full">
+       <div className={`flex flex-col min-h-screen min-h-fit bg-zinc-900 transition-all duration-300 ${isSidebarOpen ? 'w-100' : 'w-20'}`}>
+             
+             
+             <div className="flex justify-between items-center p-4 ">
+               {isSidebarOpen ? (
+                 <span className="text-zinc-300 text-lg font-semibold whitespace-nowrap">
+                   
+                 </span>
+               ) : (
+                 null
+               )}
+               
+               <button 
+                 onClick={toggleSidebar}
+                 className="p-2 rounded-lg hover:bg-gray-500/10 text-zinc-300 hover:text-white transition-colors"
+               >
+                 {isSidebarOpen ? <FiSidebar size={20} /> : <FiSidebar size={20} />}
+               </button>
+             </div>
+       
+             
+             <div className="p-4 ">
+               <button 
+                 onClick={handleNewChat}
+                 className={`flex items-center justify-center rounded-lg bg-[#10b981] hover:bg-[#16805c] text-black transition-colors ${isSidebarOpen ? 'w-full py-2 px-4' : 'w-10 h-10 p-0'}`}
+               >
+                 {isSidebarOpen ? (
+                   <>
+                     <FiMessageSquare className="mr-2 " />
+                     New Chat
+                   </>
+                 ) : (
+                   <FiMessageSquare className="text-black" size={20} />
+                 )}
+               </button>
+             </div>
+       
+             
+             <div className="flex-1 gap-1 p-5 overflow-y-auto">
+               {chats.map((chat) => (
+                 <div
+                   key={chat.id}
+                   onClick={() => setActiveChatId(chat.id)}
+                   className="p-3 rounded-lg bg-zinc-800/20  cursor-pointer flex items-center text-xs"
+                 >
+                   
+                   
+                   {isSidebarOpen && (
+                     <div className="flex-1 min-w-0">
+                       <div className="flex justify-between items-center">
+                         <h3 className="text-white font-medium truncate">{chat.name}</h3>
+                         <button className="text-gray-400 hover:text-white">
+                           <FiMoreHorizontal />
+                         </button>
+                       </div>
+                     </div>
+                   )}
+                 </div>
+               ))}
+             </div>
+           </div>
+           <div className="flex  justify-center w-full items-center p-4 md:p-5">
+           <div className="flex flex-col items-center col-reverse justify-center h-full" >
         <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`}>
         {popupIsOpen ? (
           <>
@@ -503,10 +652,11 @@ export default function Chatbot() {
         }
           </div>
         {/*<Badge />*/}
+        <div className='flex-col items-center justify-center w-full'>
         <div className={`${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
           Marketing Expert
         </div>
-        <div className={`flex flex-col h-[630px] ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[50%]'}`}>
+        <div className={`flex flex-col h-[630px] w-full ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
           <div className="flex-1 overflow-y-auto min-w-10 max-w-300 bg-transparent">
           <pre className="h-full flex flex-col-reverse relative p-[10px] h-[410px] w-full overflow-y-auto overflow-x-hidden whitespace-nowrap rounded-[8px] break-words [scrollbar-width:none]">
             <div className="p-4">
@@ -626,7 +776,7 @@ export default function Chatbot() {
           </div>
 
           {/* Input form */}
-          <form onSubmit={handleSubmit} className="min-w-fit  p-4 pb-0.5 rounded-4xl bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+          <form onSubmit={handleSubmit} className="md:min-w-[700]  p-4 pb-0.5 rounded-4xl bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
             {/* Button container */}
             
             {/* Input group */}
@@ -703,6 +853,9 @@ export default function Chatbot() {
 
           </form>
         </div>
+        </div>
+      </div>
+      </div>
       </div>
   )
 }
