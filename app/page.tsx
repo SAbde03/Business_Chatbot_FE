@@ -21,7 +21,7 @@ export default function Home() {
       
         <Sidebar/>
       <div className="flex-1 flex  justify-center items-start p-4 md:p-5">
-    <div className="w-full max-w-full ">
+    <div className="w-full max-w-full">
       <Chatbot />
     </div>
   </div>

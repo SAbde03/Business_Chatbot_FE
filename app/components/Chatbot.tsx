@@ -37,6 +37,7 @@ type MessageType = {
   streamingComplete?: boolean
   status?:boolean
   header?:string[]
+  isError?:boolean
 }
 
 class StreamingClient {
@@ -340,7 +341,8 @@ export default function Chatbot() {
         isCard: false,
         timestamp: new Date(),
         status: false,
-        data:''
+        data:'',
+        isError:false
       };
       setMessages(prev => [...prev, tempMessage]);
 
@@ -378,16 +380,18 @@ export default function Chatbot() {
                 response: data.response,
                 csv: data.csv
               };
-              setStatus(true);
+              setStatus(false);
             }
 
             // Gestion des erreurs
             if (data.status === 'error') {
               setMessages(prev => prev.map(msg => 
                 msg.id === tempMessage.id 
-                  ? { ...msg, text: `Erreur: ${data.message}`, isError: true } 
+                  ? { ...msg, text: `Erreur`, isError: true,} 
                   : msg
               ));
+              setStatus(true)
+              
               return;
             }
 
@@ -413,7 +417,6 @@ export default function Chatbot() {
           isClickedB2C: isClickedB2C,
           datatype: isClickedB2B ? 'b2b' : 'b2c',
           status: true,
-         
         };
         
         setMessages(prev => [...prev.filter(msg => msg.id !== tempMessage.id), botMessage]);
@@ -425,6 +428,7 @@ export default function Chatbot() {
         id: Date.now().toString(),
         text: 'Désolé, j\'ai rencontré un problème.',
         sender: 'bot',
+        isError:true,
         timestamp: new Date(),
         data:''
       }
@@ -438,6 +442,7 @@ export default function Chatbot() {
     if (streamingClient.current) {
       streamingClient.current.stopStream()
     }
+  
     setIsStreaming(false)
     setCurrentStreamingMessageId(null)
   }
@@ -488,7 +493,7 @@ export default function Chatbot() {
           <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
             <button className='absolute right-8 p-1 rounded-full hover:bg-gray-500/60' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
             <div className='h-fit'>
-              {messages.map((message) => (<DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C} csvFile={message.data}/>))}
+              {messages.slice(-1).map((message) => (<DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C} csvFile={message.data}/>))}
               
             </div>
             </div>
@@ -497,7 +502,7 @@ export default function Chatbot() {
           
         }
           </div>
-        <Badge />
+        {/*<Badge />*/}
         <div className={`${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
           Marketing Expert
         </div>
@@ -549,7 +554,7 @@ export default function Chatbot() {
                               </tr>
                               </thead>
                               <tbody>
-                              {message.rows?.slice(1, 2).map((dataRow, rowIndex) => (
+                              {message.rows?.slice(1, 4).map((dataRow, rowIndex) => (
                                   <tr key={`${message.id}-${rowIndex}`} className={rowIndex % 2 === 0 ? 'bg-black/20' : 'bg-zinc-800'}>
                                     {message.datatype === 'b2c' ? (
                                         <>
@@ -569,9 +574,9 @@ export default function Chatbot() {
                                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[4] || 'NaN'}</td>
                                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[5] || 'NaN'}</td>
                                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[8] || 'NaN'}</td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[8] || 'NaN'}</td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[11] || 'NaN'}</td>
                                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[36]|| 'NaN'}</td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[36]||'NAN'}</td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{dataRow[20]||'NAN'}</td>
                                         </>
                                     )}
                                   </tr>
@@ -592,7 +597,7 @@ export default function Chatbot() {
           </pre>
           </div>
 
-          <div className="flex flex-col gap-2 lg:flex-row lg:gap-5 sm:w-fit p-2 h-max w- mb-3 pl-3 bg-transparent overflow-x-auto">
+          <div className="flex flex-col gap-2 lg:flex-row lg:gap-5 sm:w-fit  p-2 h-max w- mb-3 pl-3 bg-transparent overflow-x-auto">
             {isClickedB2C ? (
                 <>
                   <div className="p-2 h-max w-fit text-sm text-zinc-600 rounded-full transition-colors border clickable cursor-pointer hover:bg-white/20 hover:text-white active:bg-gray-200 border-zinc-600" onClick={getText}>
@@ -617,11 +622,11 @@ export default function Chatbot() {
                     Les numeros de tel qui commencent par +33 4
                   </div>
                 </>
-            ) : null}
+            ) : <div></div>}
           </div>
 
           {/* Input form */}
-          <form onSubmit={handleSubmit} className="min-w-[60%] p-4 pb-0.5 rounded-4xl bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+          <form onSubmit={handleSubmit} className="min-w-fit  p-4 pb-0.5 rounded-4xl bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
             {/* Button container */}
             
             {/* Input group */}
@@ -630,7 +635,7 @@ export default function Chatbot() {
                   rows={3}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={isStreaming || status==false ? "IA en cours de réponse..." : "Ecrivez votre message..."}
+                  placeholder={isStreaming ? "IA en cours de réponse..." : "Ecrivez votre message..."}
                   disabled={isStreaming}
                   className={`flex-1 w-0 min-w-[100px] px-4 py-2  mb-3 rounded-l-lg focus:outline-none resize-none bg-transparent break-words field-sizing-content text-white placeholder-zinc-400 break-words overflow-y-auto  ${
                       isStreaming ? 'opacity-50 cursor-not-allowed' : ''

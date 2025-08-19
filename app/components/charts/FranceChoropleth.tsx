@@ -14,8 +14,10 @@ interface SvgLocation {
 }
 interface MapProps{
   csvFile: string;
+  isB2Bclicked?:boolean;
+  isB2Cclicked?:boolean;
 }
-export default function FranceMap({csvFile}:MapProps) {
+export default function FranceMap({csvFile, isB2Bclicked, isB2Cclicked}:MapProps) {
   const [hoveredRegion, setHoveredRegion] = useState<{ name: string; value: number } | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: -20, y: -20 });
   const [regionData, setRegionData] = useState<Record<string, { value: number; color: string }>>({});
@@ -39,6 +41,8 @@ export default function FranceMap({csvFile}:MapProps) {
   useEffect(() => {
   if (!csvFile) return;
 
+
+ 
   const cleanedCsv =csvFile.replace(/\\s\\n/g, '')        // Remove escaped \s\n
     .replace(/\s+\n/g, '\n')        // Clean whitespace before newlines
     .replace(/\r\n/g, '\n')         // Normalize line endings
@@ -50,24 +54,27 @@ export default function FranceMap({csvFile}:MapProps) {
     console.log("csvFile content:", csvFile)
   Papa.parse(cleanedCsv, {
     delimiter: ',',        // Auto-detect or specify
-  newline: '\n',        // Handle different line endings
-  quoteChar: '"',       // Handle quoted fields
-  skipEmptyLines: true, // Clean up data
-  header: true,         // Convert to objects
-  dynamicTyping: false,
+    newline: '\n',        // Handle different line endings
+    quoteChar: '"',       // Handle quoted fields
+    skipEmptyLines: true, // Clean up data
+    header: true,         // Convert to objects
+    dynamicTyping: false,
   transformHeader: (header) => header.trim(),  
     complete: (results) => {
       console.log("Parsing meta:", results.meta);
       console.log("[DEBUG] CSV parsed:", results.data.length, "rows");
       console.log("[DEBUG] First 10 rows:", results.data.slice(0, 10));
+      processCsvData(results.data);
       if (results.errors.length > 0) {
         setError('...');
         setIsLoading(false);
         return;
       }
-      processCsvData(results.data);
+      
+      console.log("[DEBUG] ha fin 7best");
     },
     error: (error) => {
+      
       setError('...');
       setIsLoading(false);
     },
@@ -77,6 +84,7 @@ export default function FranceMap({csvFile}:MapProps) {
 //};
 
 function processCsvData(data: any[]) {
+  
   const regionCounts: Record<string, number> = {};
   let unmappedRegions = new Set<string>();
 
@@ -141,7 +149,7 @@ const normalizeRegionName = (region: string): string | null => {
   const cleanedRegion = region
     .toLowerCase()
     .trim()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
     .replace(/[éèêë]/g, 'e')
     .replace(/[àâä]/g, 'a')
     .replace(/[îï]/g, 'i')
@@ -152,12 +160,12 @@ const normalizeRegionName = (region: string): string | null => {
     .replace(/\s+/g, '-')
     .replace(/côte/g, 'cote')
     .replace(/d'azur/g, 'dazur')
-    .replace(/^normandy$/, 'normandie') // Specific case for "Normandy"
-    .replace(/^centre$/, 'centre-val-de-loire'); // Specific case for "Centre"
+    .replace(/^normandy$/, 'normandie') 
+    .replace(/^centre$/, 'centre-val-de-loire');
 
   // Map to SVG region IDs
   const regionMap: Record<string, string> = {
-     'auvergne-rhone-alpes': 'ara',
+    'auvergne-rhone-alpes': 'ara',
     'bourgogne-franche-comte': 'bfc',
     'bretagne': 'bre',
     'centre-val-de-loire': 'cvl',
@@ -170,6 +178,7 @@ const normalizeRegionName = (region: string): string | null => {
     'occitanie': 'occ',
     'pays-de-la-loire': 'pdl',
     'provence-alpes-cote-dazur': 'pac',
+    'marseille': 'pac',
   };
 
   return regionMap[cleanedRegion] || null;
@@ -216,7 +225,7 @@ const normalizeRegionName = (region: string): string | null => {
               onMouseMove={handleMouseMove}
             >
               {france.locations.map((location) => {
-                const data = regionData[location.id] || { value:0, color: '#ffffffa9' };
+                const data = regionData[location.id] || { value:0, color: '#ffffffff' };
                 return (
                   <path
                     key={location.id}
@@ -259,7 +268,12 @@ const normalizeRegionName = (region: string): string | null => {
           {/* Legend */}
           {Object.keys(regionData).length > 0 && (
             <div className="absolute bottom-4 right-4 bg-black/80 p-3 rounded-lg">
-              <h3 className="text-white text-sm font-semibold mb-2">Nombre de personnes</h3>
+              {isB2Cclicked?(
+                  <h3 className="text-white text-sm font-semibold mb-2">Nombre de personnes</h3>
+              ):(
+                <h3 className="text-white text-sm font-semibold mb-2">Nombre d'organismes</h3>
+              )}
+              
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-emerald-800 rounded"></div>
@@ -284,7 +298,9 @@ const normalizeRegionName = (region: string): string | null => {
       )}
 
       {/* Tooltip */}
+      
       {hoveredRegion && (
+        
         <div 
           className="relative bg-black/90 text-white p-3 rounded-lg shadow-lg pointer-events-none z-50 border border-white/20"
           style={{
@@ -293,8 +309,17 @@ const normalizeRegionName = (region: string): string | null => {
             top: mousePosition.y,
           }}
         >
-          <div className="font-semibold text-[#10b981]">{hoveredRegion.name}</div>
-          <div className="text-sm">Personnes: {hoveredRegion.value}</div>
+          {isB2Bclicked?(
+            <>
+            <div className="font-semibold text-[#10b981]">{hoveredRegion.name}</div>
+            <div className="text-sm">Personnes: {hoveredRegion.value}</div>
+            </>
+          ):(
+            <>
+            <div className="font-semibold text-[#10b981]">{hoveredRegion.name}</div>
+            <div className="text-sm">Organisme: {hoveredRegion.value}</div></>
+          )}
+          
         </div>
       )}
     </div>
