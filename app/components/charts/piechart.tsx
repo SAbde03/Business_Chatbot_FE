@@ -248,7 +248,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
       }
       
       if (otherCount > 0) {
-        labels.push('Other/Unknown');
+        labels.push('Non précisé');
         values.push(otherCount);
         colors.push('#FFCE56');
       }
@@ -625,7 +625,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
       </div>
       </>)}
       
-      
+      <span className='h-7'></span>
     </div>
     
   );

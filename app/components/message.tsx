@@ -65,7 +65,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
           }`}
         >
           {message.sender === 'user' ? (null) : (
-            <RiRobot2Line className={`text-black ${message.status==false && message.isError == false ? 'animate-bounce':''}`}/>
+            <RiRobot2Line className={`text-black `}/>
           )}
         </div>
         <div
