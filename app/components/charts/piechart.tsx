@@ -66,7 +66,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
   const topMainCategoryInstanceRef = useRef<Chart<'bar'> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
+  
 
   useEffect(() => {
 
@@ -119,7 +119,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
         filledAddress++;
       }
       }
-
+      
     });
 
     return {
@@ -144,9 +144,9 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
     setAnalysisResult(analysis);
 
     // Prepare data completion chart
-
+    
     setCompletionChartData({
-
+      
       labels: isB2Bcliked ? ['Numéros de tel', 'Emails','Nom','adresse'] : ['Numéros de tel', 'Emails'],
       plugins:{
         title: {
@@ -159,7 +159,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
           label: 'Fournies',
           data: isB2Bcliked ?[analysis.filledPhoneNumbers, analysis.filledEmails, analysis.filledCompanyName, analysis.filledAddress] : [analysis.filledPhoneNumbers, analysis.filledEmails],
           backgroundColor: ['#3bb861ff'],
-
+          
         },
         {
           label: 'Manquantes',
@@ -185,7 +185,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
     .sort((a, b) => b[1] - a[1]);
     const labels = sortedCategories.map(([category]) => category).slice(0, 5);;
     const data_sorted = sortedCategories.map(([_, count]) => count).slice(0, 5);;
-
+    
     return {
       labels,
       data_sorted
@@ -200,16 +200,16 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
               display: false,
               text: '',
             }
-
+        
       },
       datasets: [
         {
           label:'Organisme',
           data:result.data_sorted,
           backgroundColor: ['#3bb861c0', '#3bb861c0'],
-
+         
           borderWidth: 1,
-
+          
         },
       ]
     });
@@ -248,7 +248,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
       }
       
       if (otherCount > 0) {
-        labels.push('Other/Unknown');
+        labels.push('Non précisé');
         values.push(otherCount);
         colors.push('#FFCE56');
       }
@@ -291,12 +291,12 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
             legend: { 
               position: 'right',
               labels: {
-                color: '#ffffffff'
+                color: '#ffffffff' 
               }
             },
             tooltip: {
               backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              titleColor: '#F3F4F6',
+              titleColor: '#F3F4F6', 
               bodyColor: '#F3F4F6',
               callbacks: {
                 label: (context) => {
@@ -311,7 +311,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
             title: {
               display: false,
               text: '',
-              color: '#374151',
+              color: '#374151', 
               font: { size: 16 }
             }
           }
@@ -339,7 +339,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
             legend: { 
               position: 'top',
               labels: {
-                color: '#ffffffff'
+                color: '#ffffffff' 
               }
             },
             tooltip: {
@@ -366,32 +366,32 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
             title: {
               display: true,
               text: '',
-              color: '#ffffffff',
+              color: '#ffffffff', 
               font: { size: 16 }
             }
           },
           scales: {
-            x: {
-              stacked: true,
-              title: {
-                display: true,
+            x: { 
+              stacked: true, 
+              title: { 
+                display: true, 
                 text: 'Nombres d\'entitées',
-                color: '#6B7280'
+                color: '#6B7280' 
               },
               grid: {
-                color: 'rgba(209, 213, 219, 0.3)'
+                color: 'rgba(209, 213, 219, 0.3)' 
               },
               ticks: {
-                color: '#6B7280'
+                color: '#6B7280' 
               }
             },
-            y: {
+            y: { 
               stacked: true,
               grid: {
                 color: 'rgba(209, 213, 219, 0.3)'
               },
               ticks: {
-                color: '#6B7280'
+                color: '#6B7280' 
               }
             }
           }
@@ -415,10 +415,10 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
+            legend: { 
               position: 'top',
               labels: {
-                color: '#ffffffff'
+                color: '#ffffffff' 
               }
             },
             tooltip: {
@@ -430,14 +430,14 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
                   const label = context.dataset.label;
                   const index = context.dataIndex;
                   if (!analysisResult) return '';
-
+                  
                   if (label === 'Fournies') {
-                    return index === 0
-                      ? `${analysisResult.phoneNumberPercentage}% of total`
+                    return index === 0 
+                      ? `${analysisResult.phoneNumberPercentage}% of total` 
                       : `${analysisResult.emailPercentage}% of total`;
                   }
-                  return index === 0
-                    ? `${(100 - parseFloat(analysisResult.phoneNumberPercentage)).toFixed(1)}% of total`
+                  return index === 0 
+                    ? `${(100 - parseFloat(analysisResult.phoneNumberPercentage)).toFixed(1)}% of total` 
                     : `${(100 - parseFloat(analysisResult.emailPercentage)).toFixed(1)}% of total`;
                 }
               }
@@ -445,7 +445,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
             title: {
               display: true,
               text: '',
-              color: '#ffffffff',
+              color: '#ffffffff', 
               font: { size: 16 }
             }
           },
@@ -455,22 +455,22 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
               title: { 
                 display: true, 
                 text: 'Nombres d\'entitées',
-                color: '#6B7280'
+                color: '#6B7280' 
               },
               grid: {
-                color: 'rgba(209, 213, 219, 0.07)'
+                color: 'rgba(209, 213, 219, 0.07)' 
               },
               ticks: {
-                color: '#6B7280'
+                color: '#6B7280' 
               }
             },
             y: { 
               stacked: true,
               grid: {
-                color: 'rgba(209, 213, 219, 0.04)'
+                color: 'rgba(209, 213, 219, 0.04)' 
               },
               ticks: {
-                color: '#6B7280'
+                color: '#6B7280' 
               }
             }
           }
@@ -480,13 +480,13 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
   }, [genderChartData, completionChartData, analysisResult, topMainCategoryData]);
 
   return (
-
+    
     <div className="max-w-full h-full mx-auto p-4 space-y-8">
       
       
       {isB2Cclicked ? (<>
-
-
+        
+       
       {analysisResult && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-6">
           <div className="flex justifiy-center items-center gap-5  bg-[#10b981]/70 bg-radial-[at_25%_25%] from-[#10b981]/70 to-[#3bb861] to-75%  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40">
@@ -552,11 +552,11 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
           <FranceMap csvFile={csvFile} />
         </div>
 
-
+        
       </div>
       </>):(<>
-
-
+        
+       
       {analysisResult && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-6">
           <div className="flex justifiy-center items-center gap-5  bg-[#10b981]/70 bg-radial-[at_25%_25%] from-[#10b981]/70 to-[#3bb861] to-75%  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40">
@@ -565,7 +565,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
                <h3 className={`font-semibold text-white-700 ${inter.className}`}>Résultats</h3>
                 <p className="text-2xl font-bold text-white-400">{analysisResult.totalEntries}</p>
               </div>
-
+           
           </div>
           <div className="flex justifiy-center items-center gap-5  bg-[#10b981]/70 bg-radial-[at_5%_25%] from-[#10b981]/70 to-[#3bb861] to-75%  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40">
             <div className='bg-white/30 w-fit h-fit  p-5  rounded-full'><BsFillTelephoneFill></BsFillTelephoneFill></div>
@@ -575,7 +575,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
               {analysisResult.filledPhoneNumbers} <span className="text-sm text-white/50">({analysisResult.phoneNumberPercentage}%)</span>
             </p>
             </div>
-
+           
           </div>
           <div className="flex justifiy-center items-center gap-5  bg-[#10b981]/70 bg-radial-[at_25%_25%] from-[#10b981]/70 to-[#3bb861] to-75%  bg-opacity-70 p-4 rounded-lg border border-[#10b981]/40">
             <div className='bg-white/30 w-fit h-fit  p-5  rounded-full'><AiFillMail className='text'></AiFillMail></div>
@@ -585,7 +585,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
               {analysisResult.filledEmails} <span className="text-sm text-white/50">({analysisResult.emailPercentage}%)</span>
             </p>
             </div>
-
+            
           </div>
         </div>
       )}
@@ -621,11 +621,11 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
           <FranceMap csvFile={csvFile} />
         </div>
 
-
+        
       </div>
       </>)}
-
       
+      <span className='h-7'></span>
     </div>
     
   );
