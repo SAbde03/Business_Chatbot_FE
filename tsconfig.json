@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-   
-    "strict": true,
+    "typeRoots": ["./node_modules/@types", "./types"],
     "noImplicitAny": true,
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],

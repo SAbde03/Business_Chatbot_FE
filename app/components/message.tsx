@@ -1,10 +1,13 @@
-import { FiCopy, FiUser } from 'react-icons/fi'
+import { FiCopy, FiMoreHorizontal, FiUser } from 'react-icons/fi'
 import { FiMessageSquare } from 'react-icons/fi'
 import { Inter, Roboto, Open_Sans } from 'next/font/google';
 import { AiFillRobot } from 'react-icons/ai';
 import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { RiRobot2Line } from "react-icons/ri";
 import rehypeHighlight from 'rehype-highlight';
+import { TbFaceIdError } from 'react-icons/tb';
+import { BiErrorCircle } from 'react-icons/bi';
 const inter = Inter({ subsets: ['latin'] });
 type MessageProps = {
   message: {
@@ -15,6 +18,7 @@ type MessageProps = {
     isCard?: boolean
     isClicked?: boolean
     status?:boolean
+    isError?:boolean
   }
   isStreaming?: boolean
 }
@@ -23,7 +27,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
   const components: Components = {
     // Bold text handling (**text**)
     strong: ({ node, ...props }) => (
-      <strong className="text-l font-bold text-inherit" {...props} />
+      <strong className="text-l font-bold text-inherit mb-2" {...props} />
     ),
 
     h1: ({node, ...props }) => (
@@ -31,7 +35,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
     ),
     // Heading level 2 handling (## text)
     h2: ({node, ...props }) => (
-      <h2 className="text-xl font-bold mt-6 mb-4  pb-2" {...props} />
+      <h2 className="text-xl font-bold mt-0 mb-4  pb-2" {...props} />
     ),
 
     // Add other heading levels if needed
@@ -41,30 +45,33 @@ export default function Message({ message, isStreaming }: MessageProps) {
     p: ({node, ...props }) => (
       <p className="text-base text-l" {...props} />
     ),
+    li: ({node, ...props }) => (
+      <li className="mb-2" {...props} />
+    ),
     a: ({node, ...props }) => (
       <a  className="text-blue-500 hover:underline" {...props} />
     ),
   };
   return (
     <div
-      className={`flex mb-10  ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+      className={`flex mb-10 mt-10 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
         className={`relative flex max-w-xs md:max-w-md lg:max-w-2xl  ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
       >
         <div
           className={`rounded-full flex items-center justify-center flex-shrink-0 ${
-            message.sender === 'user' ? 'h-0 w-0' : 'w-10 h-10 bg-gray-800 mr-3'
+            message.sender === 'user' ? 'h-0 w-0' : 'w-10 h-10 bg-[#10b981] mr-3'
           }`}
         >
           {message.sender === 'user' ? (null) : (
-            <AiFillRobot className="text-gray-500 text-xl" />
+            <RiRobot2Line className={`text-black ${message.status==false && message.isError == false ? 'animate-bounce':''}`}/>
           )}
         </div>
         <div
           className={`px-4 py-2  rounded-lg ${
             message.sender === 'user'
-              ? 'bg-zinc-600 text-white rounded-tr-none '
+              ? 'bg-gray-500/10 text-white rounded-tr-none '
               : 'bg-gray-1000 text-white-800 rounded-tl-none '
           }`}
         >{isStreaming ?(
@@ -76,11 +83,14 @@ export default function Message({ message, isStreaming }: MessageProps) {
 
         
 
-          <div className={`${inter.className}  break-words whitespace-normal  w-[100%] overflow-auto text-[15px] ${message.status == false ? 'animate-pulse text-white/30': ''}`}><ReactMarkdown
+          <div className={`${inter.className}   break-words whitespace-normal  w-[100%] overflow-auto text-[15px] ${message.status==false && message.isError == false ? 'animate-pulse text-white/30': ''} ${message.isError ? 'text-[#FF0000] flex items-center':''}` }>
+          {message.isError== true?(<BiErrorCircle className='mr-1'/>):(null)}
+          <ReactMarkdown
         remarkPlugins={[remarkGfm]}
 
         components={components}
       >
+        
     {message.text}
   </ReactMarkdown></div>
           {/* Input form <p
