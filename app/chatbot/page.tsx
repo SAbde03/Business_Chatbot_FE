@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, FiMoreHorizontal } from 'react-icons/fi'
+import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, FiMoreHorizontal, FiSearch } from 'react-icons/fi'
 import Message from '../components/message';
 import ProfileCard from './components/card'
 import Badge from './components/badge'
@@ -44,6 +44,12 @@ type Chat = {
     conversationId: string   // NEW: run_id Front
     messages: MessageType[]
 }
+
+type SourceItem = {
+    title: string;
+    url: string
+}
+
 type MessageType = {
     id: string
     text: string
@@ -64,9 +70,10 @@ type MessageType = {
     header?: string[]
     isError?: boolean
     progress?: number
+    sources?: SourceItem[]
 }
 
-// ---------------- Streaming client (POST + ReadableStream) ----------------
+
 class StreamingClient {
     private eventSource: EventSource | null = null;
     private baseUrl: string;
@@ -78,8 +85,9 @@ class StreamingClient {
 
     startStream(
         message: string,
-        userId: string,                 // NEW
-        conversationId: string,         // NEW
+        userId: string,
+        conversationId: string,
+        searchEnabled: boolean,
         callbacks: {
             onConnect?: () => void;
             onChunk?: (chunk: string) => void;
@@ -96,8 +104,8 @@ class StreamingClient {
             fetch(`${this.baseUrl}/api/stream`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // NEW: envoi des IDs pour Mem0
-                body: JSON.stringify({ input: message, userId, conversationId })
+
+                body: JSON.stringify({ input: message, userId, conversationId, searchEnabled })
             }).then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -207,6 +215,8 @@ export default function Chatbot() {
     const [status, setStatus] = useState(true)
     const [isClickedB2B, setIsClickedB2B] = useState(false)
     const [isClickedB2C, setIsClickedB2C] = useState(false)
+    const [isSearchEnabled, setIsSearchEnabled] = useState(false)
+
 
     // CHANGED: activeChatId peut devenir null après suppression
     const [activeChatId, setActiveChatId] = useState<string | null>('1');
@@ -232,7 +242,7 @@ export default function Chatbot() {
         }],
     }]);
 
-    // --- NEW (optionnel): persister les chats (dont conversationId) ---
+
     useEffect(() => {
         try {
             const raw = localStorage.getItem('mem0_chats');
@@ -335,8 +345,13 @@ export default function Chatbot() {
         }
 
         // NEW: on envoie userId + conversationId
-        streamingClient.current.startStream(userMessage.text, userId, chat.conversationId, callbacks)
-    }, [chats, userId])
+        streamingClient.current.startStream(
+            userMessage.text,
+            userId,
+            chat.conversationId,
+            isSearchEnabled,
+            callbacks)
+    }, [chats, userId, isSearchEnabled])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -374,9 +389,10 @@ export default function Chatbot() {
                     // CHANGED: input = userMessage.text + on envoie IDs
                     body: JSON.stringify({
                         choice: isClickedB2B ? 'b2b' : isClickedB2C ? 'b2c' : 'default',
-                        input: userMessage.text,                 // FIX
-                        userId,                                   // NEW
-                        conversationId: chat?.conversationId,     // NEW
+                        input: userMessage.text,
+                        userId,
+                        conversationId: chat?.conversationId,
+                        isSearchEnabled: isSearchEnabled,
                     }),
                 });
 
@@ -541,8 +557,8 @@ export default function Chatbot() {
         window.URL.revokeObjectURL(url)
     }
 
-    const handleB2BClick = () => { setIsClickedB2B(!isClickedB2B); setIsClickedB2C(false) }
-    const handleB2CClick = () => { setIsClickedB2C(!isClickedB2C); setIsClickedB2B(false) }
+    const handleB2BClick = () => { setIsClickedB2B(!isClickedB2B); setIsClickedB2C(false);setIsSearchEnabled(false); }
+    const handleB2CClick = () => { setIsClickedB2C(!isClickedB2C); setIsClickedB2B(false);setIsSearchEnabled(false); }
 
     const getText = (event: React.MouseEvent<HTMLDivElement>) => {
         const text = event.currentTarget.textContent || ''
@@ -582,7 +598,7 @@ export default function Chatbot() {
 
     return (
         <div className="flex items-center bg-black w-full">
-            <div className={`flex flex-col min-h-screen min-h-fit bg-zinc-900 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
+            <div className={`flex flex-col min-h-screen min-h-fit bg-black  transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
                 <div className="flex justify-between items-center p-4 ">
                     {isSidebarOpen ? (<span className="text-zinc-300 text-lg font-semibold whitespace-nowrap"></span>) : null}
                     <button onClick={toggleSidebar} className="p-2 rounded-lg hover:bg-gray-500/10 text-zinc-300 hover:text-white transition-colors">
@@ -783,6 +799,16 @@ export default function Chatbot() {
                                         <div className="flex gap-3  pl-3 w-fit pt-1">
                                             <button
                                                 type="button"
+                                                onClick={() => setIsSearchEnabled(prev => !prev)}
+                                                disabled={isStreaming || isClickedB2B || isClickedB2C}
+                                                className={`flex justify-center items-center gap-2 w-24 h-7 p-1 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
+                                                    : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'}  ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                title="Activer la recherche web (Serper) pour le mode par défaut"
+                                            >
+                                                <FiSearch /> Search
+                                            </button>
+                                            <button
+                                                type="button"
                                                 onClick={handleB2BClick}
                                                 disabled={isStreaming}
                                                 className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${isClickedB2B ? 'bg-[#10b981]/10 text-[#10b981]/80 border-[#10b981]/60' : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'} ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -796,6 +822,7 @@ export default function Chatbot() {
                                                 className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${isClickedB2C ? 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]' : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'} ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             ><FaUser /> B2C
                                             </button>
+
 
                                             <button
                                                 type="button"
