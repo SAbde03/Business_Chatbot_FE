@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, FiMoreHorizontal } from 'react-icons/fi'
+import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, FiMoreHorizontal, FiSettings, FiArrowUp } from 'react-icons/fi'
 import Message from '../components/message';
 import ProfileCard from './components/card'
 import Badge from './components/badge'
 import { Inter, Roboto, Open_Sans } from 'next/font/google'
-import { Building, BuildingIcon, FileChartLine, PieChart, StopCircle, StopCircleIcon } from 'lucide-react'
-import { BsBuildingFill } from 'react-icons/bs'
+import { Bold, Building, BuildingIcon, FileChartLine, PieChart, StopCircle, StopCircleIcon } from 'lucide-react'
+import { BsBuildingFill, BsFillSquareFill } from 'react-icons/bs'
 import { BiBuildings } from 'react-icons/bi'
 import { RxCross1 } from "react-icons/rx";
 import { BsFillBuildingsFill } from "react-icons/bs";
@@ -202,19 +202,7 @@ export default function Chatbot() {
     },
   ])*/
   const [chats, setChats] = useState<Chat[]>([
-  {
-    id: '1',
-    name: 'Conversation 1',
-    messages: [
-      {
-        id: '1',
-        text: 'Bonjour, comment puis-je vous aider?',
-        sender: 'bot',
-        timestamp: new Date(),
-        data: '',
-      },
-    ],
-  },
+  
 ]);
 const activeChat = chats.find(chat => chat.id === activeChatId);
 const messages = activeChat ? activeChat.messages : [];
@@ -583,10 +571,12 @@ const messages = activeChat ? activeChat.messages : [];
   };
   return (
       
-      <div className="flex items-center bg-zinc-800 w-full">
-       <div className={`flex flex-col min-h-screen min-h-fit bg-zinc-900 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
+      <div className="flex items-center bg-zinc-850 w-full">
+       <div className={`reletive  flex flex-col min-h-screen min-h-fit h-full bg-zinc-850  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
              
-             
+             <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
+                <FiSettings className='m-2 text-white font-bold'/>
+             </div>
              <div className="flex justify-between items-center p-4 ">
                {isSidebarOpen ? (
                  <span className="text-zinc-300 text-lg font-semibold whitespace-nowrap">
@@ -608,21 +598,21 @@ const messages = activeChat ? activeChat.messages : [];
              <div className="p-4 ">
                <button 
                  onClick={handleNewChat}
-                 className={`flex items-center justify-center rounded-lg bg-[#10b981] hover:bg-[#16805c] text-black transition-colors ${isSidebarOpen ? 'w-full py-2 px-4' : 'w-10 h-10 p-0'}`}
+                 className={`flex items-center justify-center rounded-lg  hover:bg-white/5 text-white hover:text-white text-[14px]  font-semibold transition-colors ${isSidebarOpen ? 'w-full py-2 px-4 flex items-center justify-start' : 'w-10 h-10 p-0'}`}
                >
                  {isSidebarOpen ? (
                    <>
-                     <FiMessageSquare className="mr-2 " />
-                     New Chat
+                     <FiMessageSquare className="mr-2 font-semibold" size={20} />
+                     Nouvelle conversation
                    </>
                  ) : (
-                   <FiMessageSquare className="text-black" size={20} />
+                   <FiMessageSquare className="text-white" size={20} />
                  )}
                </button>
              </div>
        
              
-             <div className="flex-1 gap-3 p-5 overflow-y-auto">
+             <div className={`flex-col gap-3  overflow-y-auto overflow-x-hidden  h-[80%] ${isSidebarOpen ?'pr-5 pl-2 p-0 ml-5 border-white/30 border-l': 'p-5'}  [scrollbar-width:none] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full`}>
                {chats.map((chat) => (
                  <div
                    key={chat.id}
@@ -632,14 +622,14 @@ const messages = activeChat ? activeChat.messages : [];
                    
                    
                    {isSidebarOpen && (
-                     <div className="flex-1 min-w-0">
-                       <div className={`flex justify-between items-center ${activeChatId == chat.id ? 'bg-zinc-800/20': ''}`}>
+                     <div className="flex-1 min-w-0 ">
+                       <div className={`flex justify-between items-center ${activeChatId == chat.id ? '': ''}`}>
                          <h3 className="text-white font-medium truncate">{chat.messages[chat.messages.length - 1].text || chat.name}</h3>
                          
                          <Menu as="div" className="relative inline-block text-left">
             <MenuButton 
               onClick={(e) => e.stopPropagation()}
-              className={`p-1 rounded hover:bg-zinc-200/20 transition-colors text-transparent ${activeChatId == chat.id ? ' hover:bg-gray-200/20 hover:text-white' : 'hover:text-white'}`}
+              className={`p-1 ml-2 rounded hover:bg-zinc-200/20 transition-colors text-transparent ${activeChatId == chat.id ? ' hover:bg-gray-200/20 hover:text-white' : 'hover:text-white'}`}
             >
               <FiMoreHorizontal size={16} />
             </MenuButton>
@@ -693,8 +683,44 @@ const messages = activeChat ? activeChat.messages : [];
         <div className={`${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
           Marketing Expert
         </div>
-        <div className={`flex flex-col h-[630px] w-full ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
-          <div className="flex-1 overflow-y-auto min-w-10 max-w-300 bg-transparent">
+        <div className={`flex justify-center flex-col h-[630px] w-full transition-all duration-300 ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
+          <style>{`
+      @keyframes text-appear {
+        from {opacity: 0; transform: translateY(100px);}
+        to {opacity: 1;
+        transform: translateY(0);}
+
+      }
+      @keyframes fade-in {
+        from {
+        filter:saturate(0) constrast(4) brightness(.1) blur(50px);
+        opacity: 0;
+        scale: 0.95;
+        translate: 0 4rem;
+        }
+        to {
+        filter:none
+        opacity: 1;
+        scale: 1;
+        translate: 0 0;
+        }`
+      }
+      </style>
+            {chats.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-fit transition-all duration-800"style={{
+                  animation: 'fade-in both',
+                  animationDelay: '0s',
+                  animationDuration: '0.8s'
+         
+                }}>
+                <div className="text-white text-xl text-center ">
+                  <p className="mb-4 transition-all duration-800" >Comment puis-je vous aider ?</p>
+  
+                </div>
+              </div>
+            ) : (
+
+          <div className="flex-1 overflow-y-auto min-w-10 max-w-300 bg-transparent transition-all duration-800">
           <pre className="h-full flex flex-col-reverse relative p-[10px] h-[410px] w-full overflow-y-auto overflow-x-hidden whitespace-nowrap rounded-[8px] break-words [scrollbar-width:none]">
             <div className="p-4">
               {messages.map((message) => (
@@ -783,6 +809,8 @@ const messages = activeChat ? activeChat.messages : [];
             </div>
           </pre>
           </div>
+          )}
+          
 
           <div className="flex flex-col gap-2 lg:flex-row lg:gap-5 sm:w-fit  p-2 h-max w- mb-3 pl-3 bg-transparent overflow-x-auto">
             {isClickedB2C ? (
@@ -813,7 +841,7 @@ const messages = activeChat ? activeChat.messages : [];
           </div>
 
           {/* Input form */}
-          <form onSubmit={handleSubmit} className="md:min-w-[700]  p-4 pb-0.5 rounded-4xl bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+          <form onSubmit={handleSubmit} className="md:min-w-[700]  p-4 pb-0.5 rounded-4xl bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
             {/* Button container */}
             
             {/* Input group */}
@@ -824,7 +852,7 @@ const messages = activeChat ? activeChat.messages : [];
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={isStreaming ? "IA en cours de réponse..." : "Ecrivez votre message..."}
                   disabled={isStreaming}
-                  className={`flex-1 w-0 min-w-[100px] px-4 py-2  mb-3 rounded-l-lg focus:outline-none resize-none bg-transparent break-words field-sizing-content text-white placeholder-zinc-400 break-words overflow-y-auto  ${
+                  className={`flex-1 w-0 min-w-[100px] px-4 py-2  mb-3 rounded-l-lg focus:outline-none resize-none bg-transparent break-words field-sizing-content text-white placeholder-gray-300/50 break-words overflow-y-auto  ${
                       isStreaming ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
               />
@@ -840,7 +868,7 @@ const messages = activeChat ? activeChat.messages : [];
                   className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2B
                           ? 'bg-[#10b981]/10 text-[#10b981]/80 border-[#10b981]/60' //text-blue-500 border-blue-500 //text-lime-200 border-lime-200
-                          : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
+                          : 'bg-zinc-800 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
               ><BsFillBuildingsFill />
                 B2B
@@ -852,7 +880,7 @@ const messages = activeChat ? activeChat.messages : [];
                   className={`flex justify-center items-center gap-2 w-20 h-7 p-1 text-sm rounded-xl transition-colors border ${
                       isClickedB2C
                           ? 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]' //text-blue-500 border-blue-500 //text-lime-200 border-lime-200
-                          : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
+                          : 'bg-zinc-800 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
               ><FaUser />
                 B2C
@@ -863,7 +891,7 @@ const messages = activeChat ? activeChat.messages : [];
                   className={`flex justify-center items-center gap-1 w-25 h-7 p-1 text-sm rounded-full transition-colors  ${
                       isClickedVisualize
                           ? 'bg-purple-300/10 text-purple-400 border-linear-to-bl from-violet-500 to-fuchsia-500'
-                          : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
+                          : 'bg-zinc-800 text-zinc-300 border-zinc-300 hover:bg-zinc-600'
                   } ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
               ><IoStatsChartSharp />
                 Visualiser
@@ -877,7 +905,7 @@ const messages = activeChat ? activeChat.messages : [];
                   type="submit"
                   className={`p-3 mr-0 px-2 py-2 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none `}
               >
-                <FiSend className="text-l text-black" />
+                <FiArrowUp className="text-l text-black stroke-2" size={18} />
               </button>
                 ):
                 (
@@ -886,7 +914,7 @@ const messages = activeChat ? activeChat.messages : [];
                  
                   className={`p-3 mr-0 px-2 py-2 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none`}
               >
-                <StopCircleIcon className="text-l text-black" />
+                <BsFillSquareFill className="text-l text-black rounded-[2px]" size={15}/>
               </button>
                 )
 
