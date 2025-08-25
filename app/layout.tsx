@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] })
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 const openSans = Open_Sans({ subsets: ['latin'], weight: ['400', '700'] })
 export const metadata: Metadata = {
-  title: 'Chatbot',
+  title: 'Business Expert Chatbot',
   description: 'Marketing Expert Chatbot',
 }
 

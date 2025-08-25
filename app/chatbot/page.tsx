@@ -342,7 +342,7 @@ const messages = activeChat ? activeChat.messages : [];
       }),
      });
 
-     
+
      setStatus(false)
       // Création d'un message temporaire pour le statut
       const tempMessage: MessageType = {
@@ -592,7 +592,7 @@ const messages = activeChat ? activeChat.messages : [];
       
       <div className="flex items-center bg-zinc-850 w-full overflow-hidden ">
        
-       <div className={`reletive  flex flex-col min-h-screen min-h-fit h-full bg-zinc-850  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>    
+       <div className={`reletive  flex flex-col min-h-screen min-h-fit h-full bg-black  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>    
              <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
                 <FiSettings className='m-2 text-white font-bold'/>
              </div>
@@ -705,9 +705,9 @@ const messages = activeChat ? activeChat.messages : [];
         }
           </div>
         {/*<Badge />*/}
-        <div className='flex-col items-center justify-center w-full '>
-        <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
-          Marketing Expert
+        <div className='flex-col items-center justify-center w-full  '>
+        <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s `}>
+          Business Expert
         </div>
         <div className={`flex justify-center flex-col h-[630px] w-full transition-all duration-300 ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
           <style>{`
@@ -747,7 +747,7 @@ const messages = activeChat ? activeChat.messages : [];
   
                 </div>
                 {chats.length == 0 ? (
-              <div className='w-full wh-full relative justify-center items-center flex z-[-100]  ' >
+              <div className='w-full wh-full relative justify-center items-center flex z-0  ' >
                 <div className=" absolute   rounded-full h-300 w-300 border-x border-10 border-white/20 animation-ping"></div>
                 <div className=" absolute   rounded-full h-250 w-250 border-x border-4 border-white/20"></div>
                 <div className=" absolute   rounded-full h-200 w-200 border-x border-2 border-white/20"></div>
