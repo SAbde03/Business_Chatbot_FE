@@ -3,8 +3,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BiConversation } from "react-icons/bi";
 import { BsFillBuildingsFill } from "react-icons/bs";
-import { FaGithub, FaLinkedin, FaTwitter, FaUser } from "react-icons/fa";
-import { FiArrowLeft, FiArrowLeftCircle, FiArrowRight, FiDatabase, FiEye } from "react-icons/fi";
+import { FaCertificate, FaGithub, FaLinkedin, FaTwitter, FaUser } from "react-icons/fa";
+import { FiArrowLeft, FiArrowLeftCircle, FiArrowRight, FiDatabase, FiEye, FiMap } from "react-icons/fi";
 import { IoStatsChartSharp } from "react-icons/io5";
 import { Inter, Roboto, Open_Sans,Poppins } from 'next/font/google'
 import Authentification from "./components/Authentification";
@@ -17,6 +17,8 @@ const openSans = Open_Sans({ subsets: ['latin'] })
 import React from "react";
 import Slider from "react-slick";
 import { useRef } from "react";
+import { PiCertificateLight, PiFinnTheHumanDuotone } from "react-icons/pi";
+import { AiFillSafetyCertificate } from "react-icons/ai";
 export default function LandingPage(){
     const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -110,10 +112,18 @@ export default function LandingPage(){
 
       <nav 
         className={`flex fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent backdrop-blur-sm ${hidden ? "-translate-y-full" : "translate-y-0"}`}>
+          <div className="flex justify-start items-center w-full px-4 sm:px-6 lg:px-8">
+          <img
+              src="/images/logo.png"
+              alt="Logo"
+              className="h-8 w-auto scale-100"
+              />
+          </div>
+           
         <div className="flex justify-end w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-end h-16">
             
-            
+           
             <div className="">
               <div className=" ">
                 <button className="flex items-center " onClick={handleRedirect}><a href="#" className="hover:underline">Commencer</a><FiArrowRight className="ml-2"></FiArrowRight></button>
@@ -153,19 +163,19 @@ export default function LandingPage(){
         animationTimeline: 'view(50% 30%)',
         animationDelay: '0.8s'
          
-      }}><FiDatabase size={50} /><label className={`${poppins.className}`}>Données</label><p className="text-xs font-light mt-2 text-white/60">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
-      <div className={`flex-col gap-2 text-4xl items-center justify-center text-white opacity-100 ${poppins.className} w-60 h-fit  font-semibold rounded-lg`}style={{
+      }}><FiDatabase size={50} /><label className={`${poppins.className}`}>+ 1 million de données</label><p className="text-xs font-light mt-2 text-white/60">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
+      <div className={`flex-col gap-2 text-4xl items-center justify-center text-white opacity-100 ${poppins.className} w-90 h-fit  font-semibold rounded-lg`}style={{
         animation: 'fade-in both',
         animationTimeline: 'view(50% 30%)',
         animationDelay: '0.8s'
          
-      }}><BiConversation size={50}/>Conversations<p className="text-xs font-light mt-2 text-white/30">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
+      }}><FiMap size={50}/>Couvrant tout le territoire francais<p className="text-xs font-light mt-2 text-white/30">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
       <div className={`flex-col gap-2 text-4xl items-center justify-center text-white opacity-100  ${poppins.className} w-60 h-fit font-semibold rounded-lg`}style={{
         animation: 'fade-in both',
         animationTimeline: 'view(50% 30%)',
         animationDelay: '0.8s'
          
-      }}><FiEye size={50}/>Visualisation<p className="text-xs font-light mt-2 text-white/30">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
+      }}><PiCertificateLight size={50}/>Credibilité<p className="text-xs font-light mt-2 text-white/30">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
       </div>
       </span>
       
@@ -179,7 +189,7 @@ export default function LandingPage(){
             activeStep === 1 ? "border-[#06402B]" : "border-transparent"
           } h-fit w-90 mb-10 mt-10`}>
           <h2
-            className={`text-2xl mb-2 pl-4 ${
+            className={`text-2xl mb-2 pl-4    ${
               activeStep === 1
                 ? "font-semibold text-white"
                 : "text-white/50"
@@ -322,9 +332,38 @@ export default function LandingPage(){
       
     </div>
       </div>
-      <footer className="bg-black border-t border-zinc-700 text-zinc-300 py-10 w-full">
-      <div className=" mt-10 pt-6 text-center text-sm text-zinc-500">
-        © {new Date().getFullYear()} . All rights reserved.
+      <footer className="bg-zinc-900 border-t border-zinc-700/50 text-zinc-300 py-10 w-full">
+      <div className="flex flex-col justify-center items-center gap-6 mb-10 opacity-30">
+        <img
+              src="/images/logo.png"
+              alt="Logo"
+              className="h-8 w-auto scale-200"
+              />
+              </div>
+        <div className="flex flex-row  justify-center items-center ">
+          
+        <div>
+            <ul className="text-zinc-500 dark:text-zinc-500 border-white/20 font-medium flex flex-row gap-5">
+                <li className="mb-4">
+                    <a href="#" className="hover:underline">À propos</a>
+                </li>
+                <li className="mb-4">
+                    <a href="#" className="hover:underline">Carrières</a>
+                </li>
+                <li className="mb-4">
+                    <a href="#" className="hover:underline">Centre de marque</a>
+                </li>
+                <li className="mb-4">
+                    <a href="#" className="hover:underline">Blog</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    
+        
+      <div className=" mt-0 pt-6 text-center text-sm text-zinc-500">
+        Copyright© {new Date().getFullYear()}, Tous droits réservés.
       </div>
     </footer>
       </div>

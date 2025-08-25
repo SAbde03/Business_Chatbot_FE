@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Poppins, Open_Sans } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
-
+const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
+const openSans = Open_Sans({ subsets: ['latin'], weight: ['400', '700'] })
 export const metadata: Metadata = {
   title: 'Chatbot',
   description: 'Marketing Expert Chatbot',
@@ -16,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gray-50`}>{children}</body>
+      <body className={`${poppins.className} bg-gray-50`}>{children}</body>
     </html>
   )
 }

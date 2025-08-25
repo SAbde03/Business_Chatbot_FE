@@ -5,7 +5,7 @@ import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, Fi
 import Message from '../components/message';
 import ProfileCard from './components/card'
 import Badge from './components/badge'
-import { Inter, Roboto, Open_Sans } from 'next/font/google'
+import { Inter, Roboto, Open_Sans,  } from 'next/font/google'
 import { Bold, Building, BuildingIcon, FileChartLine, PieChart, StopCircle, StopCircleIcon } from 'lucide-react'
 import { BsBuildingFill, BsFillSquareFill } from 'react-icons/bs'
 import { BiBuildings } from 'react-icons/bi'
@@ -555,6 +555,24 @@ const messages = activeChat ? activeChat.messages : [];
     setChats(prev => [...prev, newChat])
     setActiveChatId(newId)
   }
+  const handleEmptyChat = () => {
+    const newId = Date.now().toString()
+    const newChat: Chat = {
+      id: newId,
+      name: `Conversation ${chats.length + 1}`,
+      messages: [
+        {
+          id: '1',
+          text: 'Bonjour, comment puis-je vous aider?',
+          sender: 'bot',
+          timestamp: new Date(),
+          data: '',
+        },
+      ],
+    }
+    setChats(prev => [...prev, newChat])
+    setActiveChatId(newId)
+  }
   const handleDeleteChat = (chatId: string) => {
   setChats(prev => prev.filter(chat => chat.id !== chatId));
   if (activeChatId === chatId) {
@@ -571,34 +589,41 @@ const messages = activeChat ? activeChat.messages : [];
   };
   return (
       
-      <div className="flex items-center bg-zinc-850 w-full">
-       <div className={`reletive  flex flex-col min-h-screen min-h-fit h-full bg-zinc-850  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
-             
+      <div className="flex items-center bg-zinc-850 w-full overflow-hidden ">
+       
+       <div className={`reletive  flex flex-col min-h-screen min-h-fit h-full bg-zinc-850  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>    
              <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
                 <FiSettings className='m-2 text-white font-bold'/>
              </div>
-             <div className="flex justify-between items-center p-4 ">
-               {isSidebarOpen ? (
-                 <span className="text-zinc-300 text-lg font-semibold whitespace-nowrap">
-                   
-                 </span>
-               ) : (
-                 null
-               )}
-               
-               <button 
+             <div className="flex justify-between p-4">
+
+               <div className='opacity-80'>
+                  {isSidebarOpen ? (
+                    <img
+                      src="/images/logo.png"
+                      alt="Logo"
+                      className="h-8 w-auto scale-80"
+                    />
+                  ) : (
+                    null
+                  )}
+               </div>
+               <div>
+                  <button 
                  onClick={toggleSidebar}
                  className="p-2 rounded-lg hover:bg-gray-500/10 text-zinc-300 hover:text-white transition-colors"
                >
                  {isSidebarOpen ? <FiSidebar size={20} /> : <FiSidebar size={20} />}
                </button>
+               </div>
+               
              </div>
        
              
              <div className="p-4 ">
                <button 
-                 onClick={handleNewChat}
-                 className={`flex items-center justify-center rounded-lg  hover:bg-white/5 text-white hover:text-white text-[14px]  font-semibold transition-colors ${isSidebarOpen ? 'w-full py-2 px-4 flex items-center justify-start' : 'w-10 h-10 p-0'}`}
+                 onClick={handleEmptyChat}
+                 className={`flex items-center justify-center rounded-lg  hover:bg-white/5 text-white hover:text-white text-[14px]  font-semibold transition-colors transition-all duration-600 ${isSidebarOpen ? 'w-full py-2 px-4 flex items-center justify-start' : 'w-10 h-10 p-0'}`}
                >
                  {isSidebarOpen ? (
                    <>
@@ -679,8 +704,8 @@ const messages = activeChat ? activeChat.messages : [];
         }
           </div>
         {/*<Badge />*/}
-        <div className='flex-col items-center justify-center w-full'>
-        <div className={`${roboto.className} flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
+        <div className='flex-col items-center justify-center w-full '>
+        <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
           Marketing Expert
         </div>
         <div className={`flex justify-center flex-col h-[630px] w-full transition-all duration-300 ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
@@ -706,7 +731,10 @@ const messages = activeChat ? activeChat.messages : [];
         }`
       }
       </style>
+            
+            
             {chats.length === 0 ? (
+              
               <div className="flex flex-col items-center justify-center h-fit transition-all duration-800"style={{
                   animation: 'fade-in both',
                   animationDelay: '0s',
@@ -717,10 +745,20 @@ const messages = activeChat ? activeChat.messages : [];
                   <p className="mb-4 transition-all duration-800" >Comment puis-je vous aider ?</p>
   
                 </div>
+                {chats.length == 0 ? (
+              <div className='w-full wh-full relative justify-center items-center flex z-[-100]  ' >
+                <div className=" absolute   rounded-full h-300 w-300 border-x border-10 border-white/20 animation-ping"></div>
+                <div className=" absolute   rounded-full h-250 w-250 border-x border-4 border-white/20"></div>
+                <div className=" absolute   rounded-full h-200 w-200 border-x border-2 border-white/20"></div>
+                <div className=" absolute   rounded-full h-150 w-150 border-x border-0.5 border-white/20"></div>
               </div>
+            ):null}
+              </div>
+              
             ) : (
 
           <div className="flex-1 overflow-y-auto min-w-10 max-w-300 bg-transparent transition-all duration-800">
+             
           <pre className="h-full flex flex-col-reverse relative p-[10px] h-[410px] w-full overflow-y-auto overflow-x-hidden whitespace-nowrap rounded-[8px] break-words [scrollbar-width:none]">
             <div className="p-4">
               {messages.map((message) => (
@@ -841,7 +879,7 @@ const messages = activeChat ? activeChat.messages : [];
           </div>
 
           {/* Input form */}
-          <form onSubmit={handleSubmit} className="md:min-w-[700]  p-4 pb-0.5 rounded-4xl bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300">
+          <form onSubmit={handleSubmit} className="md:min-w-[700] z-100  p-4 pb-0.5 rounded-4xl bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 border border-white/20">
             {/* Button container */}
             
             {/* Input group */}
@@ -903,6 +941,7 @@ const messages = activeChat ? activeChat.messages : [];
                 {!isStreaming ?(
                   <button
                   type="submit"
+                  onClick= {chats.length == 0 ? handleNewChat : undefined}
                   className={`p-3 mr-0 px-2 py-2 bg-white text-white rounded-full hover:bg-white-700 transition-colors focus:outline-none `}
               >
                 <FiArrowUp className="text-l text-black stroke-2" size={18} />
