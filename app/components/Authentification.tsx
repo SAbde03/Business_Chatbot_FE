@@ -1,13 +1,31 @@
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
+import { useState } from 'react';
 export default function Authentification() {
+   const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
       const router = useRouter();
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+    const response = await fetch('http://localhost:3002/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: email,
+        password: password,
+      }),
+     });
+    }
+  catch (error) {
+    console.error('Error:', error);
+  }
     router.push("/chatbot");
   };
-
-
+  //
+  
     return (
     
       <div className="flex flex-col items-center justify-center w-full min-h-screen px-6 py-8 mx-auto lg:py-0">

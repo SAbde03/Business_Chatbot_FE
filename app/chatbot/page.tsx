@@ -342,6 +342,7 @@ const messages = activeChat ? activeChat.messages : [];
       }),
      });
 
+     
      setStatus(false)
       // Création d'un message temporaire pour le statut
       const tempMessage: MessageType = {

@@ -143,10 +143,10 @@ export default function LandingPage(){
       <div>
         
       </div>
-      <h1 className="text-6xl mb-4 font-bold mt-80 ">Générez des leads B2B/B2C</h1>
+      <h1 className={`text-6xl mb-4 font-bold mt-80 ${inter.className}`}>Générez des leads B2B/B2C</h1>
       <h2 className="opacity-50">Désormais, toutes les données sont entre vos mains.</h2>
       <div>
-        <button className="w-fit bg-white rounded-lg p-2 text-black mt-10 font-semibold text-underline" onClick={handleRedirect}>
+        <button className="w-fit bg-white rounded-lg p-2 text-black mt-10  text-underline" onClick={handleRedirect}>
            
                   Commencer
                 
