@@ -1,55 +1,31 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, FiMoreHorizontal, FiSearch } from 'react-icons/fi'
+import { FiSend, FiMessageSquare, FiDownload, FiSidebar, FiMoreHorizontal, FiSearch, FiTrash2 } from 'react-icons/fi'
 import Message from '../components/message';
-import ProfileCard from './components/card'
-import Badge from './components/badge'
-import { Inter, Roboto, Open_Sans } from 'next/font/google'
-import { Building, BuildingIcon, FileChartLine, PieChart, StopCircle, StopCircleIcon } from 'lucide-react'
-import { BsBuildingFill } from 'react-icons/bs'
-import { BiBuildings } from 'react-icons/bi'
+import { Inter, Roboto } from 'next/font/google'
+import { StopCircleIcon } from 'lucide-react'
 import { RxCross1 } from "react-icons/rx";
 import { BsFillBuildingsFill } from "react-icons/bs";
-import { AiFillCloseCircle, AiFillStop } from 'react-icons/ai'
 import DataAnalysisDashboard from '../components/charts/piechart';
 import { FaUser } from "react-icons/fa";
 import { IoStatsChartSharp } from 'react-icons/io5'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import { FiTrash2, FiEdit, FiCopy } from 'react-icons/fi';
 
-// ---------------- NEW: helpers userId / conversationId ----------------
-function safeUUID(): string {
-    try { return crypto.randomUUID(); } catch { return `${Date.now()}-${Math.random()}`; }
-}
 
-function getOrCreateUserId(): string {
-    if (typeof window === 'undefined') return 'anon-ssr';
-    const KEY = 'mem0_user_id';
-    let uid = localStorage.getItem(KEY);
-    if (!uid) {
-        uid = `anon-${safeUUID()}`; // pseudonyme stable, pas de PII
-        localStorage.setItem(KEY, uid);
-    }
-    return uid;
-}
 
 const inter = Inter({ subsets: ['latin'] })
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
-const openSans = Open_Sans({ subsets: ['latin'] })
-
 type Chat = {
     id: string
     name: string
-    conversationId: string   // NEW: run_id Front
+    conversationId: string
     messages: MessageType[]
 }
-
 type SourceItem = {
     title: string;
     url: string
 }
-
 type MessageType = {
     id: string
     text: string
@@ -72,163 +48,168 @@ type MessageType = {
     progress?: number
     sources?: SourceItem[]
 }
-
-
-class StreamingClient {
-    private eventSource: EventSource | null = null;
-    private baseUrl: string;
-    private isConnected: boolean = false;
-
-    constructor(baseUrl: string) {
-        this.baseUrl = baseUrl;
+function safeUUID(): string {
+    try { return crypto.randomUUID(); } catch { return `${Date.now()}-${Math.random()}`; }
+}
+function getOrCreateUserId(): string {
+    if (typeof window === 'undefined') return 'anon-ssr';
+    const KEY = 'mem0_user_id';
+    let uid = localStorage.getItem(KEY);
+    if (!uid) {
+        uid = `anon-${safeUUID()}`;
+        localStorage.setItem(KEY, uid);
     }
+    return uid;
+}
 
-    startStream(
-        message: string,
-        userId: string,
-        conversationId: string,
-        searchEnabled: boolean,
-        callbacks: {
+
+export default function Chatbot() {
+
+    class StreamingClient {
+
+        private eventSource: EventSource | null = null;
+        private baseUrl: string;
+        private isConnected: boolean = false;
+
+        constructor(baseUrl: string) {
+            this.baseUrl = baseUrl;
+        }
+
+        startStream(
+            message: string,
+            userId: string,
+            conversationId: string,
+            searchEnabled: boolean,
+            callbacks: {
+                onConnect?: () => void;
+                onChunk?: (chunk: string) => void;
+                onComplete?: (fullResponse: string) => void;
+                onError?: (error: string) => void;
+                onHeartbeat?: () => void;
+            }
+        ) {
+            if (this.eventSource) {
+                this.eventSource.close();
+            }
+
+            try {
+                fetch(`${this.baseUrl}/api/stream`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ input: message, userId, conversationId, searchEnabled })
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const reader = response.body?.getReader();
+                    if (!reader) {
+                        throw new Error('No response body reader available');
+                    }
+
+                    this.isConnected = true;
+                    callbacks.onConnect?.();
+
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+
+                    const readStream = async (): Promise<void> => {
+                        try {
+                            const { done, value } = await reader.read();
+
+                            if (done) {
+                                return;
+                            }
+
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split('\n');
+                            buffer = lines.pop() || '';
+
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        const data = JSON.parse(line.slice(6));
+                                        this.handleStreamData(data, callbacks);
+                                    } catch (parseError) {
+                                        console.error('Failed to parse stream data:', parseError);
+                                    }
+                                }
+                            }
+                            return readStream();
+                        } catch (error) {
+                            console.error('Stream reading error:', error);
+                            this.isConnected = false;
+                        }
+                    };
+                    readStream();
+                }).catch(error => {
+                    console.error('Stream connection error:', error);
+                    callbacks.onError?.(String(error));
+                });
+
+            } catch (error) {
+                console.error('Failed to start stream:', error);
+            }
+        }
+
+        private handleStreamData(data: any, callbacks: {
             onConnect?: () => void;
             onChunk?: (chunk: string) => void;
             onComplete?: (fullResponse: string) => void;
             onError?: (error: string) => void;
             onHeartbeat?: () => void;
+        }) {
+            switch (data.type) {
+                case 'start':
+                    break;
+                case 'chunk':
+                    callbacks.onChunk?.(data.content);
+                    break;
+                case 'complete':
+                    callbacks.onComplete?.(data.full_response);
+                    break;
+                case 'final_result':
+                    callbacks.onComplete?.(data.content);
+                    break;
+                case 'error':
+                case 'stream_error':
+                case 'generation_error':
+                    callbacks.onError?.(data.message);
+                    break;
+                case 'heartbeat':
+                    callbacks.onHeartbeat?.();
+                    break;
+                case 'timeout':
+                    callbacks.onError?.('Délai d\'attente dépassé');
+                    break;
+                case 'end':
+                    this.stopStream();
+                    break;
+            }
         }
-    ) {
-        if (this.eventSource) {
-            this.eventSource.close();
+
+        stopStream() {
+            if (this.eventSource) {
+                this.eventSource.close();
+                this.eventSource = null;
+            }
+            this.isConnected = false;
         }
 
-        try {
-            fetch(`${this.baseUrl}/api/stream`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-
-                body: JSON.stringify({ input: message, userId, conversationId, searchEnabled })
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const reader = response.body?.getReader();
-                if (!reader) {
-                    throw new Error('No response body reader available');
-                }
-
-                this.isConnected = true;
-                callbacks.onConnect?.();
-
-                const decoder = new TextDecoder();
-                let buffer = '';
-
-                const readStream = async (): Promise<void> => {
-                    try {
-                        const { done, value } = await reader.read();
-
-                        if (done) {
-                            return;
-                        }
-
-                        buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split('\n');
-                        buffer = lines.pop() || '';
-
-                        for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                try {
-                                    const data = JSON.parse(line.slice(6));
-                                    this.handleStreamData(data, callbacks);
-                                } catch (parseError) {
-                                    console.error('Failed to parse stream data:', parseError);
-                                }
-                            }
-                        }
-                        return readStream();
-                    } catch (error) {
-                        console.error('Stream reading error:', error);
-                        this.isConnected = false;
-                    }
-                };
-
-                readStream();
-            }).catch(error => {
-                console.error('Stream connection error:', error);
-                callbacks.onError?.(String(error));
-            });
-
-        } catch (error) {
-            console.error('Failed to start stream:', error);
+        isStreamConnected(): boolean {
+            return this.isConnected;
         }
     }
 
-    private handleStreamData(data: any, callbacks: {
-        onConnect?: () => void;
-        onChunk?: (chunk: string) => void;
-        onComplete?: (fullResponse: string) => void;
-        onError?: (error: string) => void;
-        onHeartbeat?: () => void;
-    }) {
-        switch (data.type) {
-            case 'start':
-                break;
-            case 'chunk':
-                callbacks.onChunk?.(data.content);
-                break;
-            case 'complete':
-                callbacks.onComplete?.(data.full_response);
-                break;
-            case 'final_result':
-                callbacks.onComplete?.(data.content);
-                break;
-            case 'error':
-            case 'stream_error':
-            case 'generation_error':
-                callbacks.onError?.(data.message);
-                break;
-            case 'heartbeat':
-                callbacks.onHeartbeat?.();
-                break;
-            case 'timeout':
-                callbacks.onError?.('Délai d\'attente dépassé');
-                break;
-            case 'end':
-                this.stopStream();
-                break;
-        }
-    }
-
-    stopStream() {
-        if (this.eventSource) {
-            this.eventSource.close();
-            this.eventSource = null;
-        }
-        this.isConnected = false;
-    }
-
-    isStreamConnected(): boolean {
-        return this.isConnected;
-    }
-}
-
-export default function Chatbot() {
-    const [status, setStatus] = useState(true)
+    const [, setStatus] = useState(true)
     const [isClickedB2B, setIsClickedB2B] = useState(false)
     const [isClickedB2C, setIsClickedB2C] = useState(false)
     const [isSearchEnabled, setIsSearchEnabled] = useState(false)
-
-
-    // CHANGED: activeChatId peut devenir null après suppression
     const [activeChatId, setActiveChatId] = useState<string | null>('1');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-    // --- NEW: userId persistant (localStorage) ---
     const [userId, setUserId] = useState<string>('')
     useEffect(() => { setUserId(getOrCreateUserId()); }, [])
-
-    // --- NEW: helpers conversationId par chat ---
     const makeConversationId = () => safeUUID()
-
     const [chats, setChats] = useState<Chat[]>([{
         id: '1',
         name: 'Conversation 1',
@@ -241,8 +222,6 @@ export default function Chatbot() {
             data: '',
         }],
     }]);
-
-
     useEffect(() => {
         try {
             const raw = localStorage.getItem('mem0_chats');
@@ -260,27 +239,21 @@ export default function Chatbot() {
             if (activeChatId) localStorage.setItem('mem0_active_chat_id', activeChatId);
         } catch (e) { /* ignore */ }
     }, [chats, activeChatId]);
-
     const activeChat = activeChatId ? chats.find(chat => chat.id === activeChatId) : undefined;
     const messages = activeChat ? activeChat.messages : [];
-
     const [inputValue, setInputValue] = useState('')
     const [isStreaming, setIsStreaming] = useState(false)
     const [isClickedVisualize, setVisualize] = useState(false)
     const [currentStreamingMessageId, setCurrentStreamingMessageId] = useState<string | null>(null)
-
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const streamingClient = useRef<StreamingClient | null>(null)
-
     useEffect(() => {
         // TODO: déporter en .env à terme
         streamingClient.current = new StreamingClient('http://localhost:3002')
         return () => { streamingClient.current?.stopStream() }
     }, [])
-
     const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }
     useEffect(() => { scrollToBottom() }, [messages])
-
     const appendMessage = (chatId: string, message: MessageType) => {
         setChats(prev =>
             prev.map(chat =>
@@ -304,11 +277,17 @@ export default function Chatbot() {
             )
         )
     }
-
     const handleStreamingResponse = useCallback((chatId: string, userMessage: MessageType) => {
         if (!streamingClient.current) return
         const chat = chats.find(c => c.id === chatId);
         if (!chat) return;
+
+        console.log('Starting streaming with config:', {
+            searchEnabled: isSearchEnabled,
+            userId: userId,
+            conversationId: chat.conversationId,
+            message: userMessage.text.substring(0, 50) + '...'
+        });
 
         const streamingMessageId = `streaming-${Date.now()}`
         const initialBotMessage: MessageType = {
@@ -320,31 +299,36 @@ export default function Chatbot() {
             streamingComplete: false,
             data: '',
         }
-
         appendMessage(chatId, initialBotMessage)
         setIsStreaming(true)
-
         const callbacks = {
+            onConnect: () => {
+                console.log('Stream connected');
+            },
             onChunk: (chunk: string) => {
+                console.log('Received chunk:', chunk.substring(0, 50) + '...');
                 updateMessage(chatId, streamingMessageId, msg => ({
                     ...msg, text: msg.text + chunk, isStreaming: true,
                 }))
             },
             onComplete: (fullResponse: string) => {
+                console.log(' Stream completed');
                 updateMessage(chatId, streamingMessageId, msg => ({
                     ...msg, text: fullResponse, isStreaming: false, streamingComplete: true,
                 }))
                 setIsStreaming(false)
             },
             onError: (error: string) => {
+                console.error('Stream error:', error);
                 updateMessage(chatId, streamingMessageId, msg => ({
-                    ...msg, text: error, isStreaming: false, streamingComplete: true,
+                    ...msg,
+                    text: `Erreur: ${error}`,
+                    isStreaming: false,
+                    streamingComplete: true,
                 }))
                 setIsStreaming(false)
             },
         }
-
-        // NEW: on envoie userId + conversationId
         streamingClient.current.startStream(
             userMessage.text,
             userId,
@@ -352,11 +336,17 @@ export default function Chatbot() {
             isSearchEnabled,
             callbacks)
     }, [chats, userId, isSearchEnabled])
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!inputValue.trim() || isStreaming) return
         if (!activeChatId) return
+
+        console.log('Form submitted with config:', {
+            isClickedB2B,
+            isClickedB2C,
+            isSearchEnabled,
+            inputValue: inputValue.substring(0, 50) + '...'
+        });
 
         // Ajouter le message utilisateur
         const userMessage: MessageType = {
@@ -378,21 +368,20 @@ export default function Chatbot() {
 
         try {
             if (!isClickedB2B && !isClickedB2C) {
-                // DEFAULT → streaming (SSE custom via fetch)
+                console.log('Using streaming mode with search:', isSearchEnabled);
                 handleStreamingResponse(activeChatId, userMessage)
             } else {
-                // B2B / B2C → /api/crew
+                console.log('Using B2B/B2C mode');
                 const chat = chats.find(c => c.id === activeChatId);
                 const response = await fetch('http://localhost:3002/api/crew', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // CHANGED: input = userMessage.text + on envoie IDs
                     body: JSON.stringify({
                         choice: isClickedB2B ? 'b2b' : isClickedB2C ? 'b2c' : 'default',
                         input: userMessage.text,
                         userId,
                         conversationId: chat?.conversationId,
-                        isSearchEnabled: isSearchEnabled,
+                        searchEnabled: false,
                     }),
                 });
 
@@ -534,13 +523,11 @@ export default function Chatbot() {
             setCurrentStreamingMessageId(null)
         }
     }
-
     const stopStreaming = () => {
         streamingClient.current?.stopStream()
         setIsStreaming(false)
         setCurrentStreamingMessageId(null)
     }
-
     const handleDownload = (message: MessageType) => {
         if (!message.data) {
             console.error('No data available to download')
@@ -556,18 +543,14 @@ export default function Chatbot() {
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
     }
-
     const handleB2BClick = () => { setIsClickedB2B(!isClickedB2B); setIsClickedB2C(false);setIsSearchEnabled(false); }
     const handleB2CClick = () => { setIsClickedB2C(!isClickedB2C); setIsClickedB2B(false);setIsSearchEnabled(false); }
-
     const getText = (event: React.MouseEvent<HTMLDivElement>) => {
         const text = event.currentTarget.textContent || ''
         setInputValue(text)
     }
-
     function handleVisualizeClick(): void { setpopIsOpen(!popupIsOpen) }
     const [popupIsOpen, setpopIsOpen] = useState(false);
-
     const handleNewChat = () => {
         const newId = Date.now().toString()
         const newChat: Chat = {
@@ -585,7 +568,6 @@ export default function Chatbot() {
         setChats(prev => [...prev, newChat])
         setActiveChatId(newId)
     }
-
     const handleDeleteChat = (chatId: string) => {
         setChats(prev => prev.filter(chat => chat.id !== chatId));
         if (activeChatId === chatId) {
@@ -593,7 +575,6 @@ export default function Chatbot() {
             setActiveChatId(remaining.length > 0 ? remaining[0].id : null);
         }
     };
-
     const toggleSidebar = () => { setIsSidebarOpen(!isSidebarOpen) };
 
     return (
