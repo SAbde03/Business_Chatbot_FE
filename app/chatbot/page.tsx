@@ -1,30 +1,42 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { FiSend, FiUser, FiMessageSquare, FiDownload, FiBarChart2, FiSidebar, FiMoreHorizontal, FiSettings, FiArrowUp } from 'react-icons/fi'
+import {
+    FiMessageSquare,
+    FiDownload,
+    FiBarChart2,
+    FiSidebar,
+    FiMoreHorizontal,
+    FiSettings,
+    FiArrowUp,
+    FiSearch
+} from 'react-icons/fi'
 import Message from '../components/message';
-import ProfileCard from './components/card'
-import Badge from './components/badge'
-import { Inter, Roboto, Open_Sans,  } from 'next/font/google'
-import { Bold, Building, BuildingIcon, FileChartLine, PieChart, StopCircle, StopCircleIcon } from 'lucide-react'
-import { BsBuildingFill, BsFillSquareFill } from 'react-icons/bs'
-import { BiBuildings } from 'react-icons/bi'
+import { Inter} from 'next/font/google'
+import { BsFillSquareFill } from 'react-icons/bs'
+
 import { RxCross1 } from "react-icons/rx";
 import { BsFillBuildingsFill } from "react-icons/bs";
-import { AiFillCloseCircle, AiFillStop } from 'react-icons/ai'
 import DataAnalysisDashboard from '../components/charts/piechart';
 import { FaUser } from "react-icons/fa";
 import { IoStatsChartSharp } from 'react-icons/io5'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/react';
-import {FiTrash2, FiEdit, FiCopy } from 'react-icons/fi';
+import {FiTrash2} from 'react-icons/fi';
+
 const inter = Inter({ subsets: ['latin'] })
-const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500', '700'] })
-const openSans = Open_Sans({ subsets: ['latin'] })
+
 type Chat = {
     id: string
     name: string
+    conversationId: string
     messages: MessageType[]
 }
+
+type SourceItem = {
+    title: string;
+    url: string
+}
+
 type MessageType = {
     id: string
     text: string
@@ -44,6 +56,22 @@ type MessageType = {
     status?:boolean
     header?:string[]
     isError?:boolean
+    progress?: number
+    sources?: SourceItem[]
+}
+
+function safeUUID(): string {
+    try { return crypto.randomUUID(); } catch { return `${Date.now()}-${Math.random()}`; }
+}
+function getOrCreateUserId(): string {
+    if (typeof window === 'undefined') return 'anon-ssr';
+    const KEY = 'mem0_user_id';
+    let uid = localStorage.getItem(KEY);
+    if (!uid) {
+        uid = `anon-${safeUUID()}`;
+        localStorage.setItem(KEY, uid);
+    }
+    return uid;
 }
 
 class StreamingClient {
@@ -55,7 +83,12 @@ class StreamingClient {
         this.baseUrl = baseUrl;
     }
 
-    startStream(message: string, callbacks: {
+    startStream(
+        userId: string,
+        conversationId: string,
+        searchEnabled: boolean,
+        message: string,
+        callbacks: {
         onConnect?: () => void;
         onChunk?: (chunk: string) => void;
         onComplete?: (fullResponse: string) => void;
@@ -72,7 +105,7 @@ class StreamingClient {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ input: message })
+                body: JSON.stringify({ input: message, userId, conversationId, searchEnabled})
             }).then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -187,23 +220,34 @@ class StreamingClient {
 }
 
 export default function Chatbot() {
+
     const [status, setStatus] = useState(true)
     const [isClickedB2B, setIsClickedB2B] = useState(false)
     const [isClickedB2C, setIsClickedB2C] = useState(false)
+    const [isSearchEnabled, setIsSearchEnabled] = useState(false)
     const [activeChatId, setActiveChatId] = useState('1');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    /*const [messages, setMessages] = useState<MessageType[]>([
-      {
-        id: '1',
-        text: 'Bonjour, comment puis-je vous aider?',
-        sender: 'bot',
-        timestamp: new Date(),
-        data:'',
-      },
-    ])*/
-    const [chats, setChats] = useState<Chat[]>([
-
-    ]);
+    const [userId, setUserId] = useState<string>('')
+    useEffect(() => { setUserId(getOrCreateUserId()); }, [])
+    const makeConversationId = () => safeUUID()
+    const [chats, setChats] = useState<Chat[]>([]);
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('mem0_chats');
+            if (raw) {
+                const revived = JSON.parse(raw, (k, v) => (k === 'timestamp' ? new Date(v) : v));
+                if (Array.isArray(revived) && revived.length) setChats(revived);
+            }
+            const savedActive = localStorage.getItem('mem0_active_chat_id');
+            if (savedActive) setActiveChatId(savedActive);
+        } catch (e) { /* ignore */ }
+    }, []);
+    useEffect(() => {
+        try {
+            localStorage.setItem('mem0_chats', JSON.stringify(chats));
+            if (activeChatId) localStorage.setItem('mem0_active_chat_id', activeChatId);
+        } catch (e) { /* ignore */ }
+    }, [chats, activeChatId]);
     const activeChat = chats.find(chat => chat.id === activeChatId);
     const messages = activeChat ? activeChat.messages : [];
     const [inputValue, setInputValue] = useState('')
@@ -256,6 +300,8 @@ export default function Chatbot() {
     }
     const handleStreamingResponse = useCallback((chatId: string, userMessage: MessageType) => {
         if (!streamingClient.current) return
+        const chat = chats.find(c => c.id === chatId);
+        if (!chat) return;
 
         const streamingMessageId = `streaming-${Date.now()}`
         const initialBotMessage: MessageType = {
@@ -299,8 +345,13 @@ export default function Chatbot() {
             },
         }
 
-        streamingClient.current.startStream(userMessage.text, callbacks)
-    }, [])
+        streamingClient.current.startStream(
+            userId,
+            chat?.conversationId ?? '',
+            Boolean(isSearchEnabled),
+            userMessage.text,
+            callbacks)
+    }, [chats, userId, isSearchEnabled])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -331,6 +382,7 @@ export default function Chatbot() {
                 handleStreamingResponse(activeChatId, userMessage)
             } else {
                 // Pour B2B et B2C, utiliser l'ancienne méthode
+                const chat = chats.find(c => c.id === activeChatId);
                 const response = await fetch('http://localhost:3002/api/crew', {
                     method: 'POST',
                     headers: {
@@ -338,7 +390,10 @@ export default function Chatbot() {
                     },
                     body: JSON.stringify({
                         choice: isClickedB2B ? 'b2b' : isClickedB2C ? 'b2c' : 'default',
-                        input: inputValue
+                        input: inputValue,
+                        userId,
+                        conversationId: chat?.conversationId,
+                        searchEnabled: false,
                     }),
                 });
 
@@ -369,8 +424,9 @@ export default function Chatbot() {
                 const decoder = new TextDecoder();
                 let finalData = {
                     response: '',
-                    csv: ''
-                };
+                    csv: '',
+                    headers: [] as string[]
+            };
 
                 while (reader) {
                     const { done, value } = await reader.read();
@@ -404,7 +460,8 @@ export default function Chatbot() {
                             if (data.status === 'success') {
                                 finalData = {
                                     response: data.response,
-                                    csv: data.csv
+                                    csv: data.csv,
+                                    headers: data.headers || []
                                 };
                                 setStatus(false);
                             }
@@ -900,6 +957,16 @@ export default function Chatbot() {
                                 <div >
                                     <div className="flex justify-between h-10">
                                         <div className="flex gap-3  pl-3 w-fit pt-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsSearchEnabled(prev => !prev)}
+                                                disabled={isStreaming || isClickedB2B || isClickedB2C}
+                                                className={`flex justify-center items-center gap-2 w-fit h-7 p-1 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
+                                                    : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'}  ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                title="Activer la recherche web (Serper) pour le mode par défaut"
+                                            >
+                                                <FiSearch /> Recherche
+                                            </button>
                                             <button
                                                 type="button"
                                                 onClick={handleB2BClick}
