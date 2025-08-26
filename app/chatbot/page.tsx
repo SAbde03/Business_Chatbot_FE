@@ -27,7 +27,7 @@ const inter = Inter({ subsets: ['latin'] })
 type Chat = {
     id: string
     name: string
-    conversationId: string
+    conversationId?: string
     messages: MessageType[]
 }
 
@@ -239,13 +239,13 @@ export default function Chatbot() {
             }
             const savedActive = localStorage.getItem('mem0_active_chat_id');
             if (savedActive) setActiveChatId(savedActive);
-        } catch (e) 
+        } catch (e) {}
     }, []);
     useEffect(() => {
         try {
             localStorage.setItem('mem0_chats', JSON.stringify(chats));
             if (activeChatId) localStorage.setItem('mem0_active_chat_id', activeChatId);
-        } catch (e) 
+        } catch (e) {}
     }, [chats, activeChatId]);
     const activeChat = chats.find(chat => chat.id === activeChatId);
     const messages = activeChat ? activeChat.messages : [];
@@ -648,11 +648,11 @@ export default function Chatbot() {
 
         <div className="flex items-center bg-zinc-850 w-full overflow-hidden ">
 
-            <div className={`reletive  flex flex-col min-h-screen min-h-fit h-full bg-black  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
+            <div className={`relative z-50 flex flex-col min-h-screen min-h-fit h-full bg-zinc-900  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
                 <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
                     <FiSettings className='m-2 text-white font-bold'/>
                 </div>
-                <div className="flex justify-between p-4">
+                <div className={`flex  p-4 ${isSidebarOpen ? 'justify-between' : 'justify-center'}`}>
 
                     <div className='opacity-80'>
                         {isSidebarOpen ? (
@@ -804,8 +804,9 @@ export default function Chatbot() {
                                     </div>
                                     {chats.length == 0 ? (
                                         <div className='w-full wh-full relative justify-center items-center flex z-0  ' >
-                                            <div className=" absolute   rounded-full h-250 w-250 border-x border-4 border-white/20"></div>
-                                            <div className=" absolute   rounded-full h-200 w-200 border-x border-2 border-white/20"></div>
+                                            <div className=" absolute   rounded-full h-300 w-300 border-x border-6 border-white/5"></div>
+                                            <div className=" absolute   rounded-full h-250 w-250 border-x border-4 border-white/10"></div>
+                                            <div className=" absolute   rounded-full h-200 w-200 border-x border-2 border-white/15"></div>
                                             <div className=" absolute   rounded-full h-150 w-150 border-x border-0.5 border-white/20"></div>
                                         </div>
                                     ):null}
@@ -959,8 +960,8 @@ export default function Chatbot() {
                                                 type="button"
                                                 onClick={() => setIsSearchEnabled(prev => !prev)}
                                                 disabled={isStreaming || isClickedB2B || isClickedB2C}
-                                                className={`flex justify-center items-center gap-2 w-fit h-7 p-1 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
-                                                    : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'}  ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                className={`flex justify-center items-center gap-2 w-fit pl-2 pr-2 h-7 p-1 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
+                                                    : 'bg-zinc-800 text-zinc-300 border-zinc-300 hover:bg-zinc-600'}  ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 title="Activer la recherche web (Serper) pour le mode par défaut"
                                             >
                                                 <FiSearch /> Recherche

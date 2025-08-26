@@ -133,8 +133,8 @@ export default function LandingPage(){
             </div>
             </div>
       </nav>
-      <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`}>
-        <div className=" flex justify-center items-center top-35 w-[50%] h-full z-50">
+      <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`} onClick={() => setPopIsOpen(false)}>
+        <div className=" flex justify-center items-center top-35 w-[50%] h-full z-50" onClick={(e) => e.stopPropagation()}>
         <Authentification/>
       </div>
       </div>
