@@ -637,7 +637,7 @@ export default function Chatbot() {
             if (remainingChats.length > 0) {
                 setActiveChatId(remainingChats[0].id); 
             } else {
-                setActiveChatId(null); 
+                setActiveChatId(''); 
             }
         }
     };
