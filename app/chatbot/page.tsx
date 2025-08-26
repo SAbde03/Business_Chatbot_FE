@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import {
     FiMessageSquare,
     FiDownload,
-    FiBarChart2,
     FiSidebar,
     FiMoreHorizontal,
     FiSettings,
