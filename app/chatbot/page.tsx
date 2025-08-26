@@ -88,12 +88,12 @@ class StreamingClient {
         searchEnabled: boolean,
         message: string,
         callbacks: {
-        onConnect?: () => void;
-        onChunk?: (chunk: string) => void;
-        onComplete?: (fullResponse: string) => void;
-        onError?: (error: string) => void;
-        onHeartbeat?: () => void;
-    }) {
+            onConnect?: () => void;
+            onChunk?: (chunk: string) => void;
+            onComplete?: (fullResponse: string) => void;
+            onError?: (error: string) => void;
+            onHeartbeat?: () => void;
+        }) {
         if (this.eventSource) {
             this.eventSource.close();
         }
@@ -239,13 +239,13 @@ export default function Chatbot() {
             }
             const savedActive = localStorage.getItem('mem0_active_chat_id');
             if (savedActive) setActiveChatId(savedActive);
-        } catch (e) 
+        } catch (e){}
     }, []);
     useEffect(() => {
         try {
             localStorage.setItem('mem0_chats', JSON.stringify(chats));
             if (activeChatId) localStorage.setItem('mem0_active_chat_id', activeChatId);
-        } catch (e) 
+        } catch (e){}
     }, [chats, activeChatId]);
     const activeChat = chats.find(chat => chat.id === activeChatId);
     const messages = activeChat ? activeChat.messages : [];
@@ -425,7 +425,7 @@ export default function Chatbot() {
                     response: '',
                     csv: '',
                     headers: [] as string[]
-            };
+                };
 
                 while (reader) {
                     const { done, value } = await reader.read();
@@ -635,9 +635,9 @@ export default function Chatbot() {
         if (activeChatId === chatId) {
             const remainingChats = chats.filter(chat => chat.id !== chatId);
             if (remainingChats.length > 0) {
-                setActiveChatId(remainingChats[0].id); 
+                setActiveChatId(remainingChats[0].id);
             } else {
-                setActiveChatId(null); 
+                setActiveChatId(null);
             }
         }
     };

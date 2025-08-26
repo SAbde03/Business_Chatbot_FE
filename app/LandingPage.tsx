@@ -158,24 +158,24 @@ export default function LandingPage(){
       }}
     >
       <div className="flex h-80 w-[80%] justify-center items-center gap-50  mt-80 pb-30 " >
-      <div className={`flex-col gap-4 text-4xl items-center justify-center text-white opacity-100 ${poppins.className} w-60 h-fit  font-semibold  rounded-lg`}style={{
+      <div className={`flex-col gap-4 text-3xl items-center justify-center text-white opacity-100 ${poppins.className} w-60 h-fit  font-semibold  rounded-lg`}style={{
         animation: 'fade-in both',
         animationTimeline: 'view(50% 30%)',
         animationDelay: '0.8s'
          
-      }}><FiDatabase size={50} /><label className={`${poppins.className}`}>+ 1 million de données</label><p className="text-xs font-light mt-2 text-white/60">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
-      <div className={`flex-col gap-2 text-4xl items-center justify-center text-white opacity-100 ${poppins.className} w-90 h-fit  font-semibold rounded-lg`}style={{
+      }}><FiDatabase size={50} /><label className={`${poppins.className}`}>+ 1 million de données</label></div>
+      <div className={`flex-col gap-2 text-3xl items-center justify-center text-white opacity-100 ${poppins.className} w-90 h-fit  font-semibold rounded-lg`}style={{
         animation: 'fade-in both',
         animationTimeline: 'view(50% 30%)',
         animationDelay: '0.8s'
          
-      }}><FiMap size={50}/>Couvrant tout le territoire francais<p className="text-xs font-light mt-2 text-white/30">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
-      <div className={`flex-col gap-2 text-4xl items-center justify-center text-white opacity-100  ${poppins.className} w-60 h-fit font-semibold rounded-lg`}style={{
+      }}><FiMap size={50}/>Couvrant tout le territoire francais</div>
+      <div className={`flex-col gap-2 text-3xl items-center justify-center text-white opacity-100  ${poppins.className} w-60 h-fit font-semibold rounded-lg`}style={{
         animation: 'fade-in both',
         animationTimeline: 'view(50% 30%)',
         animationDelay: '0.8s'
          
-      }}><PiCertificateLight size={50}/>Credibilité<p className="text-xs font-light mt-2 text-white/30">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p></div>
+      }}><PiCertificateLight size={50}/>Credibilité</div>
       </div>
       </span>
       
