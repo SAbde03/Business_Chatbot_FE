@@ -764,7 +764,7 @@ export default function Chatbot() {
                     {/*<Badge />*/}
                     <div className='flex-col items-center justify-center w-full '>
                         <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
-                            Marketing Expert
+                            Business Expert
                         </div>
                         <div className={`flex justify-center flex-col h-[630px] w-full transition-all duration-300 ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
                             <style>{`
@@ -805,7 +805,6 @@ export default function Chatbot() {
                                     </div>
                                     {chats.length == 0 ? (
                                         <div className='w-full wh-full relative justify-center items-center flex z-[-100]  ' >
-                                            <div className=" absolute   rounded-full h-300 w-300 border-x border-10 border-white/20 animation-ping"></div>
                                             <div className=" absolute   rounded-full h-250 w-250 border-x border-4 border-white/20"></div>
                                             <div className=" absolute   rounded-full h-200 w-200 border-x border-2 border-white/20"></div>
                                             <div className=" absolute   rounded-full h-150 w-150 border-x border-0.5 border-white/20"></div>
