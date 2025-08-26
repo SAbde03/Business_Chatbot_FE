@@ -648,7 +648,7 @@ export default function Chatbot() {
 
         <div className="flex items-center bg-zinc-850 w-full overflow-hidden ">
 
-            <div className={`relative z-50 flex flex-col min-h-screen min-h-fit h-full bg-zinc-900  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
+            <div className={`relative z-20 flex flex-col min-h-screen min-h-fit h-full bg-zinc-900  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
                 <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
                     <FiSettings className='m-2 text-white font-bold'/>
                 </div>
@@ -718,7 +718,7 @@ export default function Chatbot() {
 
             <MenuItems
               anchor="bottom"
-              className="w-fit origin-top-right rounded-md bg-zinc-800 border border-white/10 outline-none ml-9 mt-2  data-closed:scale-95 data-closed:opacity-0"
+              className="w-fit z-500 origin-top-right rounded-md bg-zinc-800 border border-white/10 outline-none ml-9 mt-2  data-closed:scale-95 data-closed:opacity-0"
             >
               <div className="">
                 <MenuItem>
@@ -727,7 +727,7 @@ export default function Chatbot() {
                       e.stopPropagation();
                       handleDeleteChat(chat.id);
                     }}
-                    className="group flex w-full items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 focus:outline-none"
+                    className="group flex  w-full items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 focus:outline-none"
                   >
                     <FiTrash2 className="mr-3" size={14} />
                     Delete
