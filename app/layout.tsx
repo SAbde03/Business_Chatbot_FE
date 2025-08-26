@@ -6,8 +6,8 @@ const inter = Inter({ subsets: ['latin'] })
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 const openSans = Open_Sans({ subsets: ['latin'], weight: ['400', '700'] })
 export const metadata: Metadata = {
-  title: 'Chatbot',
-  description: 'Marketing Expert Chatbot',
+  title: 'Business Expert Chatbot',
+  description: 'Business Expert Chatbot',
 }
 
 export default function RootLayout({
