@@ -37,8 +37,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
     h2: ({node, ...props }) => (
       <h2 className="text-xl font-bold mt-0 mb-4  pb-2" {...props} />
     ),
-
-    // Add other heading levels if needed
+    
     h3: ({node, ...props }) => (
       <h3 className="text-l font-light mt-5 mb-3" {...props} />
     ),
