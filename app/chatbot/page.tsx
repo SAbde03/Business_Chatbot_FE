@@ -959,7 +959,7 @@ export default function Chatbot() {
                                                 type="button"
                                                 onClick={() => setIsSearchEnabled(prev => !prev)}
                                                 disabled={isStreaming || isClickedB2B || isClickedB2C}
-                                                className={`flex justify-center items-center gap-2 w-fit h-7 p-1 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
+                                                className={`flex justify-center items-center gap-2 w-fit h-7 p-1 pl-2 pr-2 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
                                                     : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'}  ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 title="Activer la recherche web (Serper) pour le mode par défaut"
                                             >
