@@ -37,8 +37,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
     h2: ({node, ...props }) => (
       <h2 className="text-xl font-bold mt-0 mb-4  pb-2" {...props} />
     ),
-
-    // Add other heading levels if needed
+    
     h3: ({node, ...props }) => (
       <h3 className="text-l font-light mt-5 mb-3" {...props} />
     ),
@@ -77,10 +76,11 @@ export default function Message({ message, isStreaming }: MessageProps) {
         >{isStreaming ?(
             <div className="mt-1 mb-2 text-xs  flex items-center gap-2 ">
               <div className="w-3 h-3 bg-white rounded-full animate-ping {style}"></div>
-              
+
             </div>
         ):null}
 
+        
 
           <div className={`${inter.className}   break-words whitespace-normal  w-[100%] overflow-auto text-[15px] ${message.status==false && message.isError == false ? 'animate-pulse text-white/30': ''} ${message.isError ? 'text-[#FF0000] flex items-center':''}` }>
           {message.isError== true?(<BiErrorCircle className='mr-1'/>):(null)}

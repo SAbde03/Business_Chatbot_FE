@@ -30,7 +30,7 @@ export default function Sidebar() {
   }; */
  
   return (
-    <div className={`flex flex-col min-h-screen  bg-zinc-900 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
+    <div className={`flex flex-col min-h-screen  bg-black transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
       
       
       <div className="flex justify-between items-center p-4 ">

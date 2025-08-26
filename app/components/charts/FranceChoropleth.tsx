@@ -10,7 +10,6 @@ interface RegionData {
 interface SvgLocation {
   id: string;
   path: string;
-  // Add other properties if present in france.locations (e.g., name, centroid, etc.)
 }
 interface MapProps{
   csvFile: string;
@@ -118,7 +117,7 @@ function processCsvData(data: any[]) {
   france.locations.forEach(location => {
     newRegionData[location.id] = { 
       value: 0, 
-      color: '#ffffffff' // Default gray
+      color: '#ffffffff' 
     };
   });
 
@@ -145,7 +144,7 @@ function processCsvData(data: any[]) {
 const normalizeRegionName = (region: string): string | null => {
   if (!region) return null;
   
-  // First clean the region name
+  //clean region name
   const cleanedRegion = region
     .toLowerCase()
     .trim()
