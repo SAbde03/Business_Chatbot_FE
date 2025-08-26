@@ -239,13 +239,13 @@ export default function Chatbot() {
             }
             const savedActive = localStorage.getItem('mem0_active_chat_id');
             if (savedActive) setActiveChatId(savedActive);
-        } catch (e) { /* ignore */ }
+        } catch (e) 
     }, []);
     useEffect(() => {
         try {
             localStorage.setItem('mem0_chats', JSON.stringify(chats));
             if (activeChatId) localStorage.setItem('mem0_active_chat_id', activeChatId);
-        } catch (e) { /* ignore */ }
+        } catch (e) 
     }, [chats, activeChatId]);
     const activeChat = chats.find(chat => chat.id === activeChatId);
     const messages = activeChat ? activeChat.messages : [];
@@ -376,11 +376,11 @@ export default function Chatbot() {
         setInputValue('')
 
         try {
-            // Si c'est une requête par défaut, utiliser le streaming
+            // Requête par défaut, utiliser le streaming
             if (!isClickedB2B && !isClickedB2C) {
                 handleStreamingResponse(activeChatId, userMessage)
             } else {
-                // Pour B2B et B2C, utiliser l'ancienne méthode
+                // Pour B2B et B2C
                 const chat = chats.find(c => c.id === activeChatId);
                 const response = await fetch('http://localhost:3002/api/crew', {
                     method: 'POST',
@@ -635,9 +635,9 @@ export default function Chatbot() {
         if (activeChatId === chatId) {
             const remainingChats = chats.filter(chat => chat.id !== chatId);
             if (remainingChats.length > 0) {
-                setActiveChatId(remainingChats[0].id); // Set to first remaining chat
+                setActiveChatId(remainingChats[0].id); 
             } else {
-                setActiveChatId(null); // No chats left
+                setActiveChatId(null); 
             }
         }
     };
