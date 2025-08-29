@@ -13,7 +13,8 @@ export default function Authentification() {
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if(isLogin) {
+      e.preventDefault();
     try {
     const response = await fetch('http://localhost:5000/login', {
       method: 'POST',
@@ -39,6 +40,36 @@ export default function Authentification() {
   catch (error) {
     console.error('Error:', error);
   }
+    }
+    else if(isSignin) {
+      e.preventDefault();
+      try {
+        const response = await fetch('http://localhost:5000/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: email,
+            password: password,
+          }),
+         });
+    
+         if(response.ok) {
+        const data = await response.json();
+        console.log("Register response:", data);
+        localStorage.setItem("token", data.access_token);
+        router.push("/chatbot");
+      } else {
+        console.log(email, password);
+        console.error('Registration failed');
+      };
+        }
+      catch (error) {
+        console.error('Error:', error);
+      }
+    }
+    
 }
   
     return (

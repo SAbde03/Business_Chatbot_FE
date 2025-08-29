@@ -8,12 +8,13 @@ import {
     FiMoreHorizontal,
     FiSettings,
     FiArrowUp,
-    FiSearch
+    FiSearch,
+    FiLogOut
 } from 'react-icons/fi'
 import Message from '../components/message';
 import { Inter} from 'next/font/google'
 import { BsFillSquareFill } from 'react-icons/bs'
-
+import { useRouter } from "next/navigation";
 import { RxCross1 } from "react-icons/rx";
 import { BsFillBuildingsFill } from "react-icons/bs";
 import DataAnalysisDashboard from '../components/charts/piechart';
@@ -226,6 +227,7 @@ export default function Chatbot() {
     const [isSearchEnabled, setIsSearchEnabled] = useState(false)
     const [activeChatId, setActiveChatId] = useState('1');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const router = useRouter();
     const [userId, setUserId] = useState<string>('')
     useEffect(() => { setUserId(getOrCreateUserId()); }, [])
     const makeConversationId = () => safeUUID()
@@ -253,6 +255,11 @@ export default function Chatbot() {
     const [isStreaming, setIsStreaming] = useState(false)
     const [isClickedVisualize, setVisualize] = useState(false)
     const [currentStreamingMessageId, setCurrentStreamingMessageId] = useState<string | null>(null)
+
+    const goToLandingPage = () => {
+    router.push('./landingpage');
+    };
+
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const streamingClient = useRef<StreamingClient | null>(null)
@@ -470,14 +477,7 @@ export default function Chatbot() {
                                 setChats(prevChats =>
                                     prevChats.map(chat =>
                                         chat.id === activeChatId
-                                            ? {
-                                                ...chat,
-                                                messages: chat.messages.map(msg =>
-                                                    msg.id === tempMessage.id
-                                                        ? { ...msg, text: "Erreur", isError: true }
-                                                        : msg
-                                                ),
-                                            }
+                                            ? {...chat, messages: chat.messages.map(msg => msg.id === tempMessage.id ? { ...msg, text: "Erreur", isError: true } : msg),}
                                             : chat
                                     )
                                 );
@@ -652,6 +652,9 @@ export default function Chatbot() {
                 <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
                     <FiSettings className='m-2 text-white font-bold'/>
                 </div>
+                <div className='fixed flex  w-12 h-10   bottom-14 left-2 rounded-full justify-center items-center bg-[#FF0000] cursor-pointer transition-colors' >
+                    <FiLogOut className='m-2 text-white font-bold'/>
+                </div>
                 <div className={`flex  p-4 ${isSidebarOpen ? 'justify-between' : 'justify-center'}`}>
 
                     <div className='opacity-80'>
@@ -660,6 +663,7 @@ export default function Chatbot() {
                                 src="/images/logo.png"
                                 alt="Logo"
                                 className="h-8 w-auto scale-80"
+                                onClick={goToLandingPage}
                             />
                         ) : (
                             null

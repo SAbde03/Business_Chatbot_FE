@@ -7,7 +7,7 @@ import { FaCertificate, FaGithub, FaLinkedin, FaTwitter, FaUser } from "react-ic
 import { FiArrowLeft, FiArrowLeftCircle, FiArrowRight, FiDatabase, FiEye, FiMap } from "react-icons/fi";
 import { IoStatsChartSharp } from "react-icons/io5";
 import { Inter, Roboto, Open_Sans,Poppins } from 'next/font/google'
-import Authentification from "./components/Authentification";
+import Authentification from "../components/Authentification";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '500', '700'] })
@@ -175,7 +175,7 @@ export default function LandingPage(){
         animationTimeline: 'view(50% 30%)',
         animationDelay: '0.8s'
          
-      }}><PiCertificateLight size={50}/>Credibilité</div>
+      }}><PiCertificateLight size={70}/>Credibilité</div>
       </div>
       </span>
       

@@ -90,6 +90,7 @@ function processCsvData(data: any[]) {
   console.log("[DEBUG] Processing CSV data...");
   
   data.forEach((row, idx) => {
+    if(isB2Cclicked){
     if (row.currentRegion) {
       console.log(`[DEBUG] Row ${idx} - currentRegion raw:`, row.currentRegion);
       const region = normalizeRegionName(row.currentRegion);
@@ -101,7 +102,19 @@ function processCsvData(data: any[]) {
         unmappedRegions.add(row.currentRegion);
       }
     }
-  });
+  } else if(isB2Bclicked){
+    if (row.city) {
+      console.log(`[DEBUG] Row ${idx} - city raw:`, row.city);
+      const region = normalizeRegionName(row.city);
+      if (region) {
+        console.log(`[DEBUG] Normalized '${row.city}' -> '${region}'`);
+        regionCounts[region] = (regionCounts[region] || 0) + 1;
+      } else {
+        console.warn("[WARN] Unmapped region:", row.city);
+        unmappedRegions.add(row.city);
+      }
+    }
+  }});
 
   if (unmappedRegions.size > 0) {
     console.warn('Unmapped regions list:', Array.from(unmappedRegions));
@@ -163,7 +176,8 @@ const normalizeRegionName = (region: string): string | null => {
     .replace(/^centre$/, 'centre-val-de-loire');
 
   // Map to SVG region IDs
-  const regionMap: Record<string, string> = {
+  
+    const regionMap: Record<string, string> = {
     'auvergne-rhone-alpes': 'ara',
     'bourgogne-franche-comte': 'bfc',
     'bretagne': 'bre',
@@ -177,8 +191,74 @@ const normalizeRegionName = (region: string): string | null => {
     'occitanie': 'occ',
     'pays-de-la-loire': 'pdl',
     'provence-alpes-cote-dazur': 'pac',
+
+    //Auvergne-Rhône-Alpes
+    'lyon': 'ara',
+    'grenoble': 'ara',
+    'saint-etienne': 'ara',
+    'clermont-ferrand': 'ara',
+
+    //Bourgogne-Franche-Comté
+    'dijon': 'bfc',
+    'besancon': 'bfc',
+
+    //Bretagne
+    'rennes': 'bre',
+    'brest': 'bre',
+
+    //Centre-Val de Loire
+    'orleans': 'cvl',
+    'tours': 'cvl',
+
+    //Corse
+    'ajaccio': 'cor',
+    'bastia': 'cor',
+
+    //Grand Est
+    'strasbourg': 'ges',
+    'reims': 'ges',
+    'metz': 'ges',
+    'nancy': 'ges',
+
+    //Hauts-de-France
+    'lille': 'hdf',
+    'amiens': 'hdf',
+
+    //Île-de-France
+    'paris': 'idf',
+    'boulogne-billancourt': 'idf',
+    'saint-denis': 'idf',
+    'versailles': 'idf',
+
+    //Normandie
+    'rouen': 'nor',
+    'caen': 'nor',
+
+    //Nouvelle-Aquitaine
+    'bordeaux': 'naq',
+    'poitiers': 'naq',
+    'limoges': 'naq',
+    'pau': 'naq',
+
+    //Occitanie
+    'toulouse': 'occ',
+    'montpellier': 'occ',
+    'perpignan': 'occ',
+    'nimes': 'occ',
+
+    //Pays de la Loire
+    'nantes': 'pdl',
+    'angers': 'pdl',
+    'le-mans': 'pdl',
+
+    //Provence-Alpes-Côte d’Azur
     'marseille': 'pac',
+    'nice': 'pac',
+    'toulon': 'pac',
+    'avignon': 'pac'
   };
+  
+  
 
   return regionMap[cleanedRegion] || null;
 };
