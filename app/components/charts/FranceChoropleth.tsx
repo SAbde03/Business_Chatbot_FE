@@ -13,8 +13,8 @@ interface SvgLocation {
 }
 interface MapProps{
   csvFile: string;
-  isB2Bclicked?:boolean;
-  isB2Cclicked?:boolean;
+  isB2Bclicked:boolean;
+  isB2Cclicked:boolean;
 }
 export default function FranceMap({csvFile, isB2Bclicked, isB2Cclicked}:MapProps) {
   const [hoveredRegion, setHoveredRegion] = useState<{ name: string; value: number } | null>(null);
@@ -192,70 +192,7 @@ const normalizeRegionName = (region: string): string | null => {
     'pays-de-la-loire': 'pdl',
     'provence-alpes-cote-dazur': 'pac',
 
-    //Auvergne-Rhône-Alpes
-    'lyon': 'ara',
-    'grenoble': 'ara',
-    'saint-etienne': 'ara',
-    'clermont-ferrand': 'ara',
 
-    //Bourgogne-Franche-Comté
-    'dijon': 'bfc',
-    'besancon': 'bfc',
-
-    //Bretagne
-    'rennes': 'bre',
-    'brest': 'bre',
-
-    //Centre-Val de Loire
-    'orleans': 'cvl',
-    'tours': 'cvl',
-
-    //Corse
-    'ajaccio': 'cor',
-    'bastia': 'cor',
-
-    //Grand Est
-    'strasbourg': 'ges',
-    'reims': 'ges',
-    'metz': 'ges',
-    'nancy': 'ges',
-
-    //Hauts-de-France
-    'lille': 'hdf',
-    'amiens': 'hdf',
-
-    //Île-de-France
-    'paris': 'idf',
-    'boulogne-billancourt': 'idf',
-    'saint-denis': 'idf',
-    'versailles': 'idf',
-
-    //Normandie
-    'rouen': 'nor',
-    'caen': 'nor',
-
-    //Nouvelle-Aquitaine
-    'bordeaux': 'naq',
-    'poitiers': 'naq',
-    'limoges': 'naq',
-    'pau': 'naq',
-
-    //Occitanie
-    'toulouse': 'occ',
-    'montpellier': 'occ',
-    'perpignan': 'occ',
-    'nimes': 'occ',
-
-    //Pays de la Loire
-    'nantes': 'pdl',
-    'angers': 'pdl',
-    'le-mans': 'pdl',
-
-    //Provence-Alpes-Côte d’Azur
-    'marseille': 'pac',
-    'nice': 'pac',
-    'toulon': 'pac',
-    'avignon': 'pac'
   };
   
   
@@ -389,14 +326,15 @@ const normalizeRegionName = (region: string): string | null => {
           }}
         >
           {isB2Bclicked?(
-            <>
-            <div className="font-semibold text-[#10b981]">{hoveredRegion.name}</div>
-            <div className="text-sm">Personnes: {hoveredRegion.value}</div>
-            </>
+              <>
+                  <div className="font-semibold text-[#10b981]">{hoveredRegion.name}</div>
+                  <div className="text-sm">Organisme: {hoveredRegion.value}</div></>
           ):(
-            <>
-            <div className="font-semibold text-[#10b981]">{hoveredRegion.name}</div>
-            <div className="text-sm">Organisme: {hoveredRegion.value}</div></>
+              <>
+                  <div className="font-semibold text-[#10b981]">{hoveredRegion.name}</div>
+                  <div className="text-sm">Personnes: {hoveredRegion.value}</div>
+              </>
+
           )}
           
         </div>

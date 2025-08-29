@@ -604,7 +604,7 @@ export default function DataAnalysisDashboard({isB2Bcliked, isB2Cclicked,csvFile
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 h-150">
         <div className="bg-white/5 border-white p-4 border border-white/10 rounded-lg shadow-sm">
-          <FranceMap csvFile={csvFile} />
+          <FranceMap csvFile={csvFile} isB2Bclicked={isB2Bcliked} isB2Cclicked={isB2Cclicked} />
         </div>
 
         

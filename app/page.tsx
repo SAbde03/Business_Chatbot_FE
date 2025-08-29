@@ -28,7 +28,7 @@ const goToChatbot = () => {
   return (
     <main className="flex min-h-screen bg-zinc-800">
       <div className="w-full max-w-full">
-        <LandingPage />
+        <Chatbot/>
       </div>
     </main>
   );

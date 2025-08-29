@@ -257,7 +257,7 @@ export default function Chatbot() {
     const [currentStreamingMessageId, setCurrentStreamingMessageId] = useState<string | null>(null)
 
     const goToLandingPage = () => {
-    router.push('./landingpage');
+        router.push('./landingpage');
     };
 
 
@@ -404,25 +404,25 @@ export default function Chatbot() {
                 });
 
 
-     setStatus(false)
-      // Création d'un message temporaire pour le statut
-      const tempMessage: MessageType = {
-        id: `temp-${Date.now()}`,
-        text: 'Traitement en cours...',
-        sender: 'bot',
-        isCard: false,
-        timestamp: new Date(),
-        status: false,
-        data:'',
-        isError:false
-      };
-      setChats(prevChats =>
-      prevChats.map(chat =>
-      chat.id === activeChatId
-      ? { ...chat, messages: [...chat.messages, tempMessage] }
-      : chat
-        )
-      );
+                setStatus(false)
+                // Création d'un message temporaire pour le statut
+                const tempMessage: MessageType = {
+                    id: `temp-${Date.now()}`,
+                    text: 'Traitement en cours...',
+                    sender: 'bot',
+                    isCard: false,
+                    timestamp: new Date(),
+                    status: false,
+                    data:'',
+                    isError:false
+                };
+                setChats(prevChats =>
+                    prevChats.map(chat =>
+                        chat.id === activeChatId
+                            ? { ...chat, messages: [...chat.messages, tempMessage] }
+                            : chat
+                    )
+                );
 
 
                 // Lecture du flux SSE
@@ -495,7 +495,7 @@ export default function Chatbot() {
                 // Remplacement du message temporaire par le résultat final
                 if (finalData.response) {
                     const rows = finalData.csv.split('\n').map((row: string) => row.split(','));
-
+                    console.log(finalData.csv);
                     const botMessage: MessageType = {
                         id: Date.now().toString(),
                         text: finalData.response,
@@ -637,7 +637,7 @@ export default function Chatbot() {
             if (remainingChats.length > 0) {
                 setActiveChatId(remainingChats[0].id);
             } else {
-                setActiveChatId(''); 
+                setActiveChatId('');
             }
         }
     };
@@ -720,57 +720,57 @@ export default function Chatbot() {
                                                 <FiMoreHorizontal size={16} />
                                             </MenuButton>
 
-            <MenuItems
-              anchor="bottom"
-              className="w-fit z-500 origin-top-right rounded-md bg-zinc-800 border border-white/10 outline-none ml-9 mt-2  data-closed:scale-95 data-closed:opacity-0"
-            >
-              <div className="">
-                <MenuItem>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteChat(chat.id);
-                    }}
-                    className="group flex  w-full items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 focus:outline-none"
-                  >
-                    <FiTrash2 className="mr-3" size={14} />
-                    Delete
-                  </button>
-                </MenuItem>
-              </div>
-            </MenuItems>
-          </Menu>
-                       </div>
-                     </div>
-                   )}
-                 </div>
-               ))}
-             </div>
-           </div>
-           <div className="flex  justify-center w-full items-center p-4 md:p-5">
-           <div className="flex flex-col items-center col-reverse justify-center h-full" >
-        <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`}>
-        {popupIsOpen ? (
-          <>
-          <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
-            <button className='absolute right-8 p-1 rounded-full hover:bg-gray-500/60' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
-            <div className='h-fit'>
-              {messages.slice(-1).map((message) => (<DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C} csvFile={message.data}/>))}
-              
+                                            <MenuItems
+                                                anchor="bottom"
+                                                className="w-fit z-500 origin-top-right rounded-md bg-zinc-800 border border-white/10 outline-none ml-9 mt-2  data-closed:scale-95 data-closed:opacity-0"
+                                            >
+                                                <div className="">
+                                                    <MenuItem>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteChat(chat.id);
+                                                            }}
+                                                            className="group flex  w-full items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 focus:outline-none"
+                                                        >
+                                                            <FiTrash2 className="mr-3" size={14} />
+                                                            Delete
+                                                        </button>
+                                                    </MenuItem>
+                                                </div>
+                                            </MenuItems>
+                                        </Menu>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
-            </div>
-            </>
-            ):null
-          
-        }
-          </div>
-        {/*<Badge />*/}
-        <div className='flex-col items-center justify-center w-full  '>
-        <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s `}>
-          Business Expert
-        </div>
-        <div className={`flex justify-center flex-col h-[630px] w-full transition-all duration-300 ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
-          <style>{`
+            <div className="flex  justify-center w-full items-center p-4 md:p-5">
+                <div className="flex flex-col items-center col-reverse justify-center h-full" >
+                    <div className={`fixed  z-5000 inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`} onClick={() => setpopIsOpen(false)}>
+                        {popupIsOpen ? (
+                            <>
+                                <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
+                                    <button className='absolute right-8 p-1 rounded-full hover:bg-gray-500/60' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
+                                    <div className='h-fit' onClick={(e) => e.stopPropagation()}>
+                                        {messages.slice(-1).map((message) => (<DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C} csvFile={message.data}/>))}
+
+                                    </div>
+                                </div>
+                            </>
+                        ):null
+
+                        }
+                    </div>
+                    {/*<Badge />*/}
+                    <div className='flex-col items-center justify-center w-full  '>
+                        <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s `}>
+                            Business Expert
+                        </div>
+                        <div className={`flex justify-center flex-col h-[630px] w-full transition-all duration-300 ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
+                            <style>{`
       @keyframes text-appear {
         from {opacity: 0; transform: translateY(100px);}
         to {opacity: 1;
@@ -940,7 +940,7 @@ export default function Chatbot() {
                             </div>
 
                             {/* Input form */}
-                            <form onSubmit={handleSubmit} className="md:min-w-[700] z-100  p-4 pb-0.5 rounded-4xl bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 border border-white/20">
+                            <form onSubmit={handleSubmit} className="md:min-w-[700] z-50  p-4 pb-0.5 rounded-4xl bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 border border-white/20">
                                 {/* Button container */}
 
                                 {/* Input group */}
