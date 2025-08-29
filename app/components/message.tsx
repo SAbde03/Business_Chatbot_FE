@@ -59,7 +59,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
         className={`relative flex max-w-xs md:max-w-md lg:max-w-2xl  ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
       >
         <div
-          className={`rounded-full flex items-center justify-center flex-shrink-0 ${
+          className={`rounded-full rounded-bl-0 flex items-center justify-center flex-shrink-0 ${
             message.sender === 'user' ? 'h-0 w-0' : 'w-10 h-10 bg-[#10b981] mr-3'
           }`}
         >
@@ -70,7 +70,7 @@ export default function Message({ message, isStreaming }: MessageProps) {
         <div
           className={`px-4 py-2  rounded-lg ${
             message.sender === 'user'
-              ? 'bg-gray-500/10 text-white rounded-tr-none '
+              ? 'bg-gray-500/30 text-white rounded-tr-none '
               : 'bg-gray-1000 text-white-800 rounded-tl-none '
           }`}
         >{isStreaming ?(
