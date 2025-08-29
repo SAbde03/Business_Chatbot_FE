@@ -8,12 +8,13 @@ import {
     FiMoreHorizontal,
     FiSettings,
     FiArrowUp,
-    FiSearch
+    FiSearch,
+    FiLogOut
 } from 'react-icons/fi'
 import Message from '../components/message';
 import { Inter} from 'next/font/google'
 import { BsFillSquareFill } from 'react-icons/bs'
-
+import { useRouter } from "next/navigation";
 import { RxCross1 } from "react-icons/rx";
 import { BsFillBuildingsFill } from "react-icons/bs";
 import DataAnalysisDashboard from '../components/charts/piechart';
@@ -27,7 +28,7 @@ const inter = Inter({ subsets: ['latin'] })
 type Chat = {
     id: string
     name: string
-    conversationId: string
+    conversationId?: string
     messages: MessageType[]
 }
 
@@ -226,6 +227,7 @@ export default function Chatbot() {
     const [isSearchEnabled, setIsSearchEnabled] = useState(false)
     const [activeChatId, setActiveChatId] = useState('1');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const router = useRouter();
     const [userId, setUserId] = useState<string>('')
     useEffect(() => { setUserId(getOrCreateUserId()); }, [])
     const makeConversationId = () => safeUUID()
@@ -239,13 +241,13 @@ export default function Chatbot() {
             }
             const savedActive = localStorage.getItem('mem0_active_chat_id');
             if (savedActive) setActiveChatId(savedActive);
-        } catch (e){}
+        } catch (e){}{}
     }, []);
     useEffect(() => {
         try {
             localStorage.setItem('mem0_chats', JSON.stringify(chats));
             if (activeChatId) localStorage.setItem('mem0_active_chat_id', activeChatId);
-        } catch (e){}
+        } catch (e){}{}
     }, [chats, activeChatId]);
     const activeChat = chats.find(chat => chat.id === activeChatId);
     const messages = activeChat ? activeChat.messages : [];
@@ -253,6 +255,11 @@ export default function Chatbot() {
     const [isStreaming, setIsStreaming] = useState(false)
     const [isClickedVisualize, setVisualize] = useState(false)
     const [currentStreamingMessageId, setCurrentStreamingMessageId] = useState<string | null>(null)
+
+    const goToLandingPage = () => {
+        router.push('./landingpage');
+    };
+
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const streamingClient = useRef<StreamingClient | null>(null)
@@ -470,14 +477,7 @@ export default function Chatbot() {
                                 setChats(prevChats =>
                                     prevChats.map(chat =>
                                         chat.id === activeChatId
-                                            ? {
-                                                ...chat,
-                                                messages: chat.messages.map(msg =>
-                                                    msg.id === tempMessage.id
-                                                        ? { ...msg, text: "Erreur", isError: true }
-                                                        : msg
-                                                ),
-                                            }
+                                            ? {...chat, messages: chat.messages.map(msg => msg.id === tempMessage.id ? { ...msg, text: "Erreur", isError: true } : msg),}
                                             : chat
                                     )
                                 );
@@ -495,7 +495,7 @@ export default function Chatbot() {
                 // Remplacement du message temporaire par le résultat final
                 if (finalData.response) {
                     const rows = finalData.csv.split('\n').map((row: string) => row.split(','));
-
+                    console.log(finalData.csv);
                     const botMessage: MessageType = {
                         id: Date.now().toString(),
                         text: finalData.response,
@@ -637,7 +637,7 @@ export default function Chatbot() {
             if (remainingChats.length > 0) {
                 setActiveChatId(remainingChats[0].id);
             } else {
-                setActiveChatId(null);
+                setActiveChatId('');
             }
         }
     };
@@ -646,11 +646,14 @@ export default function Chatbot() {
     };
     return (
 
-        <div className="flex items-center bg-zinc-850 w-full overflow-hidden ">
+        <div className="flex items-center bg-zinc-900/70 w-full overflow-hidden ">
 
-            <div className={`relative z-50 flex flex-col min-h-screen min-h-fit h-full bg-zinc-900  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
+            <div className={`relative z-20 flex flex-col min-h-screen min-h-fit h-full bg-zinc-900  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
                 <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
                     <FiSettings className='m-2 text-white font-bold'/>
+                </div>
+                <div className='fixed flex  w-12 h-10   bottom-14 left-2 rounded-full justify-center items-center bg-[#FF0000] cursor-pointer transition-colors' >
+                    <FiLogOut className='m-2 text-white font-bold'/>
                 </div>
                 <div className={`flex  p-4 ${isSidebarOpen ? 'justify-between' : 'justify-center'}`}>
 
@@ -660,6 +663,7 @@ export default function Chatbot() {
                                 src="/images/logo.png"
                                 alt="Logo"
                                 className="h-8 w-auto scale-80"
+                                onClick={goToLandingPage}
                             />
                         ) : (
                             null
@@ -718,7 +722,7 @@ export default function Chatbot() {
 
                                             <MenuItems
                                                 anchor="bottom"
-                                                className="w-fit origin-top-right rounded-md bg-zinc-800 border border-white/10 outline-none ml-9 mt-2  data-closed:scale-95 data-closed:opacity-0"
+                                                className="w-fit z-500 origin-top-right rounded-md bg-zinc-800 border border-white/10 outline-none ml-9 mt-2  data-closed:scale-95 data-closed:opacity-0"
                                             >
                                                 <div className="">
                                                     <MenuItem>
@@ -727,7 +731,7 @@ export default function Chatbot() {
                                                                 e.stopPropagation();
                                                                 handleDeleteChat(chat.id);
                                                             }}
-                                                            className="group flex w-full items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 focus:outline-none"
+                                                            className="group flex  w-full items-center px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 focus:outline-none"
                                                         >
                                                             <FiTrash2 className="mr-3" size={14} />
                                                             Delete
@@ -745,12 +749,12 @@ export default function Chatbot() {
             </div>
             <div className="flex  justify-center w-full items-center p-4 md:p-5">
                 <div className="flex flex-col items-center col-reverse justify-center h-full" >
-                    <div className={`fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`}>
+                    <div className={`fixed  z-5000 inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto ${!popupIsOpen ? 'w-0 h-0' :' w-[100%] h-[100%]  backdrop-blur-[0.8px] bg-zinc-950/90 [scrollbar-width:] [scrollbar-color:#8c9096_transparent] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:#7e8085 [&::-webkit-scrollbar-thumb]:rounded-full' }`} onClick={() => setpopIsOpen(false)}>
                         {popupIsOpen ? (
                             <>
                                 <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
-                                    <button className='absolute right-8 p-1 rounded-full hover:bg-gray-500/60' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
-                                    <div className='h-fit'>
+
+                                    <div className='h-fit' onClick={(e) => e.stopPropagation()}>
                                         {messages.slice(-1).map((message) => (<DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C} csvFile={message.data}/>))}
 
                                     </div>
@@ -761,8 +765,8 @@ export default function Chatbot() {
                         }
                     </div>
                     {/*<Badge />*/}
-                    <div className='flex-col items-center justify-center w-full '>
-                        <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s`}>
+                    <div className='flex-col items-center justify-center w-full  '>
+                        <div className={` flex items-center justify-center p-4 bg-transparent rounded-t-lg text-s `}>
                             Business Expert
                         </div>
                         <div className={`flex justify-center flex-col h-[630px] w-full transition-all duration-300 ${isClickedB2B || isClickedB2C ? 'w-fit rounded-lg bg-transparent' : 'w-[100]'}`}>
@@ -803,9 +807,10 @@ export default function Chatbot() {
 
                                     </div>
                                     {chats.length == 0 ? (
-                                        <div className='w-full wh-full relative justify-center items-center flex z-[-100]  ' >
-                                            <div className=" absolute   rounded-full h-250 w-250 border-x border-4 border-white/20"></div>
-                                            <div className=" absolute   rounded-full h-200 w-200 border-x border-2 border-white/20"></div>
+                                        <div className='w-full wh-full relative justify-center items-center flex z-0  ' >
+                                            <div className=" absolute   rounded-full h-300 w-300 border-x border-6 border-white/5"></div>
+                                            <div className=" absolute   rounded-full h-250 w-250 border-x border-4 border-white/10"></div>
+                                            <div className=" absolute   rounded-full h-200 w-200 border-x border-2 border-white/15"></div>
                                             <div className=" absolute   rounded-full h-150 w-150 border-x border-0.5 border-white/20"></div>
                                         </div>
                                     ):null}
@@ -935,7 +940,7 @@ export default function Chatbot() {
                             </div>
 
                             {/* Input form */}
-                            <form onSubmit={handleSubmit} className="md:min-w-[700] z-100  p-4 pb-0.5 rounded-4xl bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 border border-white/20">
+                            <form onSubmit={handleSubmit} className="md:min-w-[700] z-50  p-4 pb-0.5 rounded-4xl bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 border border-white/20">
                                 {/* Button container */}
 
                                 {/* Input group */}
@@ -959,8 +964,8 @@ export default function Chatbot() {
                                                 type="button"
                                                 onClick={() => setIsSearchEnabled(prev => !prev)}
                                                 disabled={isStreaming || isClickedB2B || isClickedB2C}
-                                                className={`flex justify-center items-center gap-2 w-fit h-7 p-1 pl-2 pr-2 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
-                                                    : 'bg-zinc-700 text-zinc-300 border-zinc-300 hover:bg-zinc-600'}  ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                className={`flex justify-center items-center gap-2 w-fit pl-2 pr-2 h-7 p-1 pl-2 pr-2 text-sm rounded-xl transition-colors border ${isSearchEnabled ? 'bg-blue-500/10 text-blue-400 border-blue-400/60'
+                                                    : 'bg-zinc-800 text-zinc-300 border-zinc-300 hover:bg-zinc-600'}  ${isStreaming ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 title="Activer la recherche web (Serper) pour le mode par défaut"
                                             >
                                                 <FiSearch /> Recherche

@@ -7,7 +7,7 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] })
 const openSans = Open_Sans({ subsets: ['latin'], weight: ['400', '700'] })
 export const metadata: Metadata = {
   title: 'Business Expert Chatbot',
-  description: 'Business Expert Chatbot',
+  description: 'Marketing Expert Chatbot',
 }
 
 export default function RootLayout({

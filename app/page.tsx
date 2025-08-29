@@ -1,12 +1,11 @@
 "use client";
 import Chatbot from './chatbot/page';
-import LandingPage from './LandingPage';
+import LandingPage from './landingpage/page';
 import Dashboard from './components/charts/piechart';
 import Sidebar from './components/sideBar';
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useState } from 'react';
-import HorizontalBarChart from "./components/charts/ProgressBar"
 import PieChart from "./components/charts/piechart";
 import { CrossIcon } from 'lucide-react';
 import { AiFillCloseCircle } from 'react-icons/ai';
@@ -29,7 +28,7 @@ const goToChatbot = () => {
   return (
     <main className="flex min-h-screen bg-zinc-800">
       <div className="w-full max-w-full">
-        <LandingPage />
+        <Chatbot/>
       </div>
     </main>
   );
