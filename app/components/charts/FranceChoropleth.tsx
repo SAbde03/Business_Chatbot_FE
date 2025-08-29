@@ -215,6 +215,10 @@ const normalizeRegionName = (region: string): string | null => {
         'aix-en-provence': 'pac',
         'avignon': 'pac',
         'cannes': 'pac',
+        'draguignan' : 'pac',
+        'frejus' : 'pac',
+        'menton':'pac',
+        'saint-tropez':'pac',
 
         // Occitanie
         'toulouse': 'occ',
