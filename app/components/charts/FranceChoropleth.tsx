@@ -90,7 +90,21 @@ function processCsvData(data: any[]) {
   console.log("[DEBUG] Processing CSV data...");
   
   data.forEach((row, idx) => {
-    if(isB2Cclicked){
+
+      if(isB2Bclicked){
+      if (row.city) {
+          console.log(`[DEBUG] Row ${idx} - city raw:`, row.city);
+          const region = normalizeRegionName(row.city);
+          if (region) {
+              console.log(`[DEBUG] Normalized '${row.city}' -> '${region}'`);
+              regionCounts[region] = (regionCounts[region] || 0) + 1;
+          } else {
+              console.warn("[WARN] Unmapped region:", row.city);
+              unmappedRegions.add(row.city);
+          }
+      }
+      }
+     else if(!isB2Bclicked){
     if (row.currentRegion) {
       console.log(`[DEBUG] Row ${idx} - currentRegion raw:`, row.currentRegion);
       const region = normalizeRegionName(row.currentRegion);
@@ -100,18 +114,6 @@ function processCsvData(data: any[]) {
       } else {
         console.warn("[WARN] Unmapped region:", row.currentRegion);
         unmappedRegions.add(row.currentRegion);
-      }
-    }
-  } else if(isB2Bclicked){
-    if (row.city) {
-      console.log(`[DEBUG] Row ${idx} - city raw:`, row.city);
-      const region = normalizeRegionName(row.city);
-      if (region) {
-        console.log(`[DEBUG] Normalized '${row.city}' -> '${region}'`);
-        regionCounts[region] = (regionCounts[region] || 0) + 1;
-      } else {
-        console.warn("[WARN] Unmapped region:", row.city);
-        unmappedRegions.add(row.city);
       }
     }
   }});
@@ -176,26 +178,110 @@ const normalizeRegionName = (region: string): string | null => {
     .replace(/^centre$/, 'centre-val-de-loire');
 
   // Map to SVG region IDs
-  
     const regionMap: Record<string, string> = {
-    'auvergne-rhone-alpes': 'ara',
-    'bourgogne-franche-comte': 'bfc',
-    'bretagne': 'bre',
-    'centre-val-de-loire': 'cvl',
-    'corse': 'cor',
-    'grand-est': 'ges',
-    'hauts-de-france': 'hdf',
-    'ile-de-france': 'idf',
-    'normandie': 'nor',
-    'nouvelle-aquitaine': 'naq',
-    'occitanie': 'occ',
-    'pays-de-la-loire': 'pdl',
-    'provence-alpes-cote-dazur': 'pac',
+        'auvergne-rhone-alpes': 'ara',
+        'bourgogne-franche-comte': 'bfc',
+        'bretagne': 'bre',
+        'centre-val-de-loire': 'cvl',
+        'corse': 'cor',
+        'grand-est': 'ges',
+        'hauts-de-france': 'hdf',
+        'ile-de-france': 'idf',
+        'normandie': 'nor',
+        'nouvelle-aquitaine': 'naq',
+        'occitanie': 'occ',
+        'pays-de-la-loire': 'pdl',
+        'provence-alpes-cote-dazur': 'pac',
+        // Île-de-France
+        'paris': 'idf',
+        'boulogne-billancourt': 'idf',
+        'saint-denis': 'idf',
+        'versailles': 'idf',
+        'nanterre': 'idf',
+        'creteil': 'idf',
 
+        // Auvergne-Rhône-Alpes
+        'lyon': 'ara',
+        'grenoble': 'ara',
+        'saint-etienne': 'ara',
+        'clermont-ferrand': 'ara',
+        'annecy': 'ara',
+        'chambery': 'ara',
 
-  };
-  
-  
+        // Provence-Alpes-Côte d’Azur
+        'marseille': 'pac',
+        'nice': 'pac',
+        'toulon': 'pac',
+        'aix-en-provence': 'pac',
+        'avignon': 'pac',
+        'cannes': 'pac',
+
+        // Occitanie
+        'toulouse': 'occ',
+        'montpellier': 'occ',
+        'nimes': 'occ',
+        'perpignan': 'occ',
+        'beziers': 'occ',
+        'carcassonne': 'occ',
+
+        // Nouvelle-Aquitaine
+        'bordeaux': 'naq',
+        'limoges': 'naq',
+        'poitiers': 'naq',
+        'pau': 'naq',
+        'bayonne': 'naq',
+        'la-rochelle': 'naq',
+
+        // Pays de la Loire
+        'nantes': 'pdl',
+        'angers': 'pdl',
+        'le-mans': 'pdl',
+        'saint-nazaire': 'pdl',
+        'laval': 'pdl',
+
+        // Bretagne
+        'rennes': 'bre',
+        'brest': 'bre',
+        'quimper': 'bre',
+        'lorient': 'bre',
+        'vannes': 'bre',
+
+        // Grand Est
+        'strasbourg': 'ges',
+        'reims': 'ges',
+        'metz': 'ges',
+        'nancy': 'ges',
+        'mulhouse': 'ges',
+
+        // Hauts-de-France
+        'lille': 'hdf',
+        'amiens': 'hdf',
+        'roubaix': 'hdf',
+        'tourcoing': 'hdf',
+        'dunkerque': 'hdf',
+
+        // Normandie
+        'rouen': 'nor',
+        'caen': 'nor',
+        'le-havre': 'nor',
+        'cherbourg': 'nor',
+
+        // Centre-Val de Loire
+        'orleans': 'cvl',
+        'tours': 'cvl',
+        'chartres': 'cvl',
+        'bourges': 'cvl',
+
+        // Bourgogne-Franche-Comté
+        'dijon': 'bfc',
+        'besancon': 'bfc',
+        'belfort': 'bfc',
+        'chalon-sur-saone': 'bfc',
+
+        // Corse
+        'ajaccio': 'cor',
+        'bastia': 'cor',
+    };
 
   return regionMap[cleanedRegion] || null;
 };

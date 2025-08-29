@@ -646,7 +646,7 @@ export default function Chatbot() {
     };
     return (
 
-        <div className="flex items-center bg-zinc-850 w-full overflow-hidden ">
+        <div className="flex items-center bg-zinc-900/70 w-full overflow-hidden ">
 
             <div className={`relative z-20 flex flex-col min-h-screen min-h-fit h-full bg-zinc-900  border-r border-white/30 transition-all duration-300 ${isSidebarOpen ? 'w-80' : 'w-20'}`}>
                 <div className='fixed flex  w-12 h-10 border-[1.5px] border-white bottom-3 left-2 rounded-full justify-center items-center hover:bg-gray-500/30 cursor-pointer transition-colors' >
@@ -753,7 +753,7 @@ export default function Chatbot() {
                         {popupIsOpen ? (
                             <>
                                 <div className={`relative  gap-2 bg-transparent to-blue-950 p-6 rounded-lg shadow-xl ' w-[90%] h-[95%]`}>
-                                    <button className='absolute right-8 p-1 rounded-full hover:bg-gray-500/60' onClick={() => setpopIsOpen(false)}><RxCross1/></button>
+
                                     <div className='h-fit' onClick={(e) => e.stopPropagation()}>
                                         {messages.slice(-1).map((message) => (<DataAnalysisDashboard isB2Bcliked={isClickedB2B} isB2Cclicked={isClickedB2C} csvFile={message.data}/>))}
 
